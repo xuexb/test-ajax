@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express')
 var open = require('open');
 var path = require('path');
@@ -165,7 +167,8 @@ module.exports = function(options) {
             console.log(data['res'])
             data['res'] = template.compile(data['res'])({
                 get: req.query,
-                post: req.body
+                post: req.body,
+                global: config.global
             });
         }
 
