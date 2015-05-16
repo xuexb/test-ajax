@@ -5,16 +5,19 @@ var marked = require('marked');
 var template = require('art-template/node/template-native.js');
 
 
-var PATH = 'cache/';
-
 var admin = module.exports = {};
 
+
+admin.config = null;
 
 /**
  * 创建模板
  */
 admin.create = function(req, res) {
-    res.render('create');
+    res.render('create', {
+        admin_url: admin.config.admin,
+        doc_url: admin.config.doc,
+    });
 }
 
 /**
@@ -28,7 +31,7 @@ admin.doc = function(req, res) {
         return res.send('uri empty');
     }
 
-    uri = path.resolve(PATH, uri + '.json');
+    uri = path.resolve(admin.config.cache_path, uri + '.json');
 
     //不存在 
     if (!fs.existsSync(uri)) {
@@ -41,11 +44,10 @@ admin.doc = function(req, res) {
         return res.send('json error');
     }
 
-    html = template.compile(fs.readFileSync('./views/doc.tpl').toString())({
+    html = template.compile(fs.readFileSync(path.resolve(admin.config.base, 'views', 'doc.tpl')).toString())({
         data: data
     });
 
-    console.log(html)
 
     res.render('doc', {
         html: marked(html)
@@ -58,11 +60,11 @@ admin.doc = function(req, res) {
 admin.list = function(req, res) {
     var data;
 
-    if (fs.existsSync(path.resolve(PATH))) {
-        data = fs.readdirSync(path.resolve(PATH));
+    if (fs.existsSync(admin.config.cache_path)) {
+        data = fs.readdirSync(admin.config.cache_path);
         if (data && data.length > 0) {
             data.forEach(function(that, index) {
-                data[index] = JSON.parse(fs.readFileSync(path.resolve(PATH, that)).toString());
+                data[index] = JSON.parse(fs.readFileSync(path.resolve(admin.config.cache_path, that)).toString());
                 delete data[index]['res'];
 
                 //截取
@@ -74,7 +76,9 @@ admin.list = function(req, res) {
     }
 
     res.render('list', {
-        data: data
+        data: data,
+        admin_url: admin.config.admin,
+        doc_url: admin.config.doc,
     });
 }
 
@@ -90,7 +94,7 @@ admin.del = function(req, res) {
         return res.send('uri empty');
     }
 
-    uri = path.resolve(PATH, uri + '.json');
+    uri = path.resolve(admin.config.cache_path, uri + '.json');
 
     //不存在 
     if (!fs.existsSync(uri)) {
@@ -115,7 +119,7 @@ admin.edit = function(req, res) {
         return res.send('uri empty');
     }
 
-    uri = path.resolve(PATH, uri + '.json');
+    uri = path.resolve(admin.config.cache_path, uri + '.json');
 
     if (!fs.existsSync(uri)) {
         return res.send('404');
@@ -128,7 +132,9 @@ admin.edit = function(req, res) {
     }
 
     res.render('edit', {
-        data: data
+        data: data,
+        admin_url: admin.config.admin,
+        doc_url: admin.config.doc,
     });
 }
 
@@ -161,10 +167,10 @@ admin.save = function(req, res) {
     }
 
     // 拼路径
-    url = path.resolve(PATH, md5(url) + '.json');
+    url = path.resolve(admin.config.cache_path, md5(url) + '.json');
 
     // 创建缓存目录
-    mkdir(path.resolve(PATH));
+    mkdir(path.resolve(admin.config.cache_path));
 
     // 写文件
     fs.writeFileSync(url, JSON.stringify(data));

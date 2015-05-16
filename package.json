@@ -1,10 +1,10 @@
 {
   "name": "test-ajax",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "本地测试接口",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm install && node test.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,14 @@
   },
   "homepage": "https://github.com/xuexb/test-ajax",
   "devDependencies": {
+    "express": "*",
+    "open": "*",
+    "art-template": "3.x",
+    "MD5": "*",
+    "body-parser":"*",
+    "marked": "*"
+  },
+  "dependencies": {
     "express": "*",
     "open": "*",
     "art-template": "3.x",

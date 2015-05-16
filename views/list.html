@@ -25,7 +25,7 @@
     
     <h1>API列表</h1>
     <p>
-        <a href="/_admin/create">添加</a>
+        <a href="<%=admin_url%>create">添加</a>
     </p>
     
     <ul id="list">
@@ -36,9 +36,9 @@
                         <a href="<%=val.url%>" target="_blank"><%=val.url%></a> <%if(val.desc){%>[<%=val.desc%>]<%}%>
                     </div>
                     <div class="fr">
-                        <a href="/_admin/edit/<%=val.uri%>">编辑</a>
-                        <a onclick="return confirm('确认删除吗？');" href="/_admin/del/<%=val.uri%>">删除</a>
-                        <a href="/doc/<%=val.uri%>" target="_blank">文档</a>
+                        <a href="<%=admin_url%>edit/<%=val.uri%>">编辑</a>
+                        <a onclick="return confirm('确认删除吗？');" href="<%=admin_url%>del/<%=val.uri%>">删除</a>
+                        <a href="<%=doc_url%><%=val.uri%>" target="_blank">文档</a>
                     </div>
                 </li>
             <%});%>
