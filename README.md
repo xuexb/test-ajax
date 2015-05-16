@@ -24,6 +24,8 @@ test_ajax({
 });
 ```
 
+[在线demo](http://test-ajax.xuexb.com/)
+
 ## options
 
 ### prot
