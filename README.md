@@ -24,7 +24,7 @@ test_ajax({
 });
 ```
 
-[在线demo](http://test-ajax.xuexb.com/)
+[在线demo](http://test-ajax.xuexb.com/admin/)
 
 ## options
 
