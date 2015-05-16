@@ -25,7 +25,7 @@
     
     <h1>API列表</h1>
     <p>
-        <a href="/_admin/api/create">添加</a>
+        <a href="/_admin/create">添加</a>
     </p>
     
     <ul id="list">
@@ -33,12 +33,12 @@
             <%data.forEach(function(val, index){%>
                 <li>
                     <div class="fl">
-                        路径： <a href="<%=val.url%>" target="_blank"><%=val.url%></a>
+                        <a href="<%=val.url%>" target="_blank"><%=val.url%></a> <%if(val.desc){%>[<%=val.desc%>]<%}%>
                     </div>
                     <div class="fr">
-                        <a href="/_admin/api/edit/<%=val.uri%>">编辑</a>
-                        <a onclick="return confirm('确认删除吗？');" href="/_admin/api/del/<%=val.uri%>">删除</a>
-                        <a href="#">文档</a>
+                        <a href="/_admin/edit/<%=val.uri%>">编辑</a>
+                        <a onclick="return confirm('确认删除吗？');" href="/_admin/del/<%=val.uri%>">删除</a>
+                        <a href="/doc/<%=val.uri%>" target="_blank">文档</a>
                     </div>
                 </li>
             <%});%>

@@ -1,6 +1,9 @@
 var md5 = require('MD5');
 var fs = require('fs');
 var path = require('path');
+var marked = require('marked');
+var template = require('art-template/node/template-native.js');
+
 
 var PATH = 'cache/';
 
@@ -13,42 +16,89 @@ var admin = module.exports = {};
 admin.create = function(req, res) {
     res.render('create');
 }
-    
-/**
- * 列表
- */
-admin.list = function(req, res){
-    var data = fs.readdirSync(path.resolve(PATH));
-
-    if(data && data.length > 0){
-        data.forEach(function(that, index){
-            data[index] = JSON.parse(fs.readFileSync(path.resolve(PATH, that)).toString());
-            delete data[index]['res'];
-        });
-    }
-
-    res.render('list', {data: data});
-}
 
 /**
- * 删除
- * @param {string} uri 链接uri
+ * 文档预览
  */
-admin.del = function(req, res){
-    var uri = req.param('uri');
+admin.doc = function(req, res) {
+    var uri = req.param('uri'),
+        data, html;
 
-    if(!uri){
+    if (!uri) {
         return res.send('uri empty');
     }
 
     uri = path.resolve(PATH, uri + '.json');
 
     //不存在 
-    if(!fs.existsSync(uri)){
+    if (!fs.existsSync(uri)) {
+        return res.send('404');
+    }
+
+    try {
+        data = JSON.parse(fs.readFileSync(uri).toString());
+    } catch (e) {
+        return res.send('json error');
+    }
+
+    html = template.compile(fs.readFileSync('./views/doc.tpl').toString())({
+        data: data
+    });
+
+    console.log(html)
+
+    res.render('doc', {
+        html: marked(html)
+    });
+}
+
+/**
+ * 列表
+ */
+admin.list = function(req, res) {
+    var data;
+
+    if (fs.existsSync(path.resolve(PATH))) {
+        data = fs.readdirSync(path.resolve(PATH));
+        if (data && data.length > 0) {
+            data.forEach(function(that, index) {
+                data[index] = JSON.parse(fs.readFileSync(path.resolve(PATH, that)).toString());
+                delete data[index]['res'];
+
+                //截取
+                if (data[index].desc) {
+                    data[index].desc = String(data[index].desc).substr(0, 20) + '...';
+                }
+            });
+        }
+    }
+
+    res.render('list', {
+        data: data
+    });
+}
+
+
+/**
+ * 删除
+ * @param {string} uri 链接uri
+ */
+admin.del = function(req, res) {
+    var uri = req.param('uri');
+
+    if (!uri) {
+        return res.send('uri empty');
+    }
+
+    uri = path.resolve(PATH, uri + '.json');
+
+    //不存在 
+    if (!fs.existsSync(uri)) {
         return res.send('404');
     }
 
     fs.unlinkSync(uri);
+
     res.send('成功');
 }
 
@@ -57,26 +107,42 @@ admin.del = function(req, res){
  * 编辑
  * @param {string} uri 链接uri
  */
-admin.edit = function(req, res){
-    var uri = req.param('uri');
+admin.edit = function(req, res) {
+    var uri = req.param('uri'),
+        data;
 
-    if(!uri){
+    if (!uri) {
         return res.send('uri empty');
     }
 
-    res.send(uri)
+    uri = path.resolve(PATH, uri + '.json');
+
+    if (!fs.existsSync(uri)) {
+        return res.send('404');
+    }
+
+    try {
+        data = JSON.parse(fs.readFileSync(uri).toString());
+    } catch (e) {
+        res.send('json error');
+    }
+
+    res.render('edit', {
+        data: data
+    });
 }
+
 
 /**
  * 保存
  */
-admin.save = function(req, res){
+admin.save = function(req, res) {
     var data = req.body;
     var url = data.url;
     var uri;
 
     //根目录
-    if(!url || url === '/'){
+    if (!url || url === '/') {
         return res.send('url error');
     }
 
@@ -85,6 +151,14 @@ admin.save = function(req, res){
 
     // 追加
     data.uri = uri;
+
+    //处理多个参数
+    if (data.param_name && 'string' === typeof data.param_name) {
+        data.param_name = [data.param_name];
+        data.param_type = [data.param_type];
+        data.param_required = [data.param_required];
+        data.param_desc = [data.param_desc];
+    }
 
     // 拼路径
     url = path.resolve(PATH, md5(url) + '.json');

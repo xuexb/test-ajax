@@ -3,7 +3,7 @@ var app = express();
 var open = require('open');
 var path = require('path');
 var md5 = require('MD5');
-var template = require('./arttemplate');
+var template = require('art-template/node/template-native.js');
 var admin = require('./admin');
 var fs = require('fs');
 var path = require('path');
@@ -14,7 +14,9 @@ var URL = require('url');
 //静态资源
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(bodyParser.json());
 
 // 配置模板
@@ -25,20 +27,23 @@ app.set('view engine', 'html');
 
 
 
-app.get('/_admin/api/create', admin.create);
-app.post('/_admin/api/save', admin.save);
-app.get('/_admin/api/list', admin.list);
-app.get('/_admin/api/del/:uri', admin.del);
-app.get('/_admin/api/edit/:uri', admin.edit);
+app.get('/doc/:uri', admin.doc);
+app.get('/_admin/create', admin.create);
+app.post('/_admin/save', admin.save);
+app.get('/_admin/', admin.list);
+app.get('/_admin/del/:uri', admin.del);
+app.get('/_admin/edit/:uri', admin.edit);
 
-app.all('*', function(req, res, next){
-    var uri, url = URL.parse(req.url), is_file, data,
+//截获到其他的请求
+app.all('*', function(req, res, next) {
+    var uri, url = URL.parse(req.url),
+        is_file, data,
         param_err_arr, param_data;
 
     url = url.pathname;
 
     //如果为根目录
-    if(!url || url === '/'){
+    if (!url || url === '/') {
         return res.send('/');
     }
 
@@ -47,40 +52,46 @@ app.all('*', function(req, res, next){
 
     is_file = fs.existsSync(uri);
 
-    if(!is_file){
-        return res.send('404,'+ url);
+    if (!is_file) {
+        return res.json({
+            errcode: -1,
+            errmsg: '404 error'
+        });
     }
 
     //值容错
-    try{
+    try {
         data = JSON.parse(fs.readFileSync(uri).toString());
-    } catch(e){
-        res.send('json error');
+    } catch (e) {
+        return res.json({
+            errcode: -1,
+            errmsg: 'json error'
+        });
     }
 
     //类型不对
-    if(req.method !== data.method){
-        return res.send('method error');
+    if (req.method !== data.method) {
+        return res.json({
+            errcode: -1,
+            errmsg: 'method error'
+        });
     }
 
     //如果需要验证参数
-    if(data.param_name){
+    if (data.param_name) {
         param_err_arr = [];
 
-        if('string' === typeof data.param_name){
-            data.param_name = [data.param_name];
-        }
-
-        if(data.method === 'GET'){
+        if (data.method === 'GET') {
             param_data = req.query;
         } else {
             param_data = req.body;
         }
 
-        data.param_name.forEach(function(val, index){
+        // 验证参数
+        data.param_name.forEach(function(val, index) {
 
             //如果为必须，而参数里又没有
-            if(data.param_required[index] && !param_data[val]){
+            if (data.param_required[index] && !param_data[val]) {
                 param_err_arr.push({
                     name: val,
                     type: 'required'
@@ -89,16 +100,16 @@ app.all('*', function(req, res, next){
             }
 
             //如果参数里有这个值 并且不是全部类型
-            if(param_data[val] && data.param_type[index] !== '*'){
-                if(data.param_type[index] === 'boolean' && 
+            if (param_data[val] && data.param_type[index] !== '*') {
+                if (data.param_type[index] === 'boolean' &&
                     (param_data[val] !== 'true' && param_data[val] !== 'false')
-                ){
+                ) {
                     param_err_arr.push({
                         name: val,
                         type: 'type not boolean'
                     });
                     return;
-                } else if(data.param_type[index] === 'int' && !/^\d+$/.test(param_data[val])){
+                } else if (data.param_type[index] === 'int' && !/^\d+$/.test(param_data[val])) {
                     param_err_arr.push({
                         name: val,
                         type: 'type not int'
@@ -108,46 +119,46 @@ app.all('*', function(req, res, next){
             }
         });
 
-        if(param_err_arr.length){
+        if (param_err_arr.length) {
             return res.json({
-                error: param_err_arr
+                errcode: -1,
+                errmsg: param_err_arr
             })
         }
     }
 
     //如果模板需要编译
-    if(data['res-tpl']){
+    if (data['res-tpl']) {
+        console.log(data['res'])
         data['res'] = template.compile(data['res'])({
-            query: req.query,
-            body: req.body
+            get: req.query,
+            post: req.body
         });
-
-        console.log(data['res']);
     }
 
-
-    (function(callback){
-        if(data.delay){
+    (function(callback) {
+        if (data.delay) {
             setTimeout(callback, data.delay);
         } else {
             callback();
         }
-    })(function(){
-        if(data.dataType === 'json'){
-            try{
+    })(function() {
+        if (data.dataType === 'json') {
+            console.log(data['res'])
+            try {
                 data['res'] = JSON.parse(data['res']);
-            } catch(e){
-                data['res'] = {'error': 1}
+            } catch (e) {
+                data['res'] = {
+                    errcode: -1,
+                    errmsg: 'tpl  compile json error'
+                }
             }
-            res.json(data['res']);
-            res.end();
+            res.send(data['res']);
         } else {
             res.send(data['res'] || 'empty');
         }
-
     });
 });
 
 app.listen(3000);
-
 // open('http://127.0.0.1:3000');
