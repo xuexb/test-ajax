@@ -4,8 +4,8 @@
 
 ## install
 
-``` shell
-npm test-ajax && npm test
+```
+npm install test-ajax
 ```
 
 ## demo
