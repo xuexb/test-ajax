@@ -1,1 +1,0 @@
-{"url":"/api/test","desc":"","method":"GET","delay":"","dataType":"json","res-tpl":"1","res":" {\"json\":<%=params.a%>} "}

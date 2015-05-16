@@ -10,7 +10,7 @@
     <h1>创建api</h1>
 
     <form action="./save" method="post">
-        <ul>
+        <ul id="J-create">
             <li>
                 链接: <input type="text" name="url">
             </li>
@@ -23,8 +23,28 @@
                     <option value="POST">POST</option>
                     <option value="PUT">PUT</option>
                     <option value="DELETE">DELETE</option>
-                    <option value="ALL">ALL</option>
                 </select>
+            </li>
+            <li>
+                <dl>
+                    <dt style="padding-bottom:20px;">参数 <a href="#" class="J-param-add">添加</a></dt>
+                    <dd>
+                        <input type="text" placeholder="参数名" name="param_name">
+                        <input type="text" placeholder="参数说明" name="param_desc">
+                        <select name="param_type">
+                            <option value="*">全部类型</option>
+                            <option value="int">int</option>
+                            <option value="boolean">boolean</option>
+                            <option value="string">string</option>
+                        </select>
+                        <select name="param_required">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+
+                        <a href="#" class="J-param-del">删除</a>
+                    </dd>
+                </dl>
             </li>
             <li>
                 延迟: <input type="text" name="delay">
@@ -54,6 +74,41 @@
             </li>
         </ul>
     </form>
+
+
+    <script type="text/javascript" src="http://libs.useso.com/js/jquery/1.11.1-rc2/jquery.min.js"></script>
+    <script type="text/template" id="J-param-tpl">
+        <dd>
+            <input type="text" placeholder="参数名" name="param_name">
+            <input type="text" placeholder="参数说明" name="param_desc">
+            <select name="param_type">
+                <option value="*">全部类型</option>
+                <option value="int">int</option>
+                <option value="boolean">boolean</option>
+                <option value="string">string</option>
+            </select>
+            <select name="param_required">
+                <option value="0">否</option>
+                <option value="1">是</option>
+            </select>  
+
+            <a href="#" class="J-param-del">删除</a>
+        </dd>
+    </script>
+    <script type="text/javascript">
+        (function(){
+            $('#J-create').on('click', '.J-param-add', function(){
+                $(this).closest('dl').append($('#J-param-tpl').html());
+                return false;
+            });
+
+            $('#J-create').on('click', '.J-param-del', function(){
+                $(this).closest('dd').remove();
+                return false;
+            });
+
+        })();
+    </script>
 
 </body>
 </html>

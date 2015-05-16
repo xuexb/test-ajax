@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+
+    <style type="text/css">
+        #list li{
+            height:30px;line-height:30px;
+            overflow:hidden;
+        }
+        .fl{
+            float:left;
+        }
+        .fr{
+            float:right;
+        }
+
+        ul{
+            list-style:none;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>API列表</h1>
+    <p>
+        <a href="/_admin/api/create">添加</a>
+    </p>
+    
+    <ul id="list">
+        <%if(data && data.length){%>
+            <%data.forEach(function(val, index){%>
+                <li>
+                    <div class="fl">
+                        路径： <a href="<%=val.url%>" target="_blank"><%=val.url%></a>
+                    </div>
+                    <div class="fr">
+                        <a href="/_admin/api/edit/<%=val.uri%>">编辑</a>
+                        <a onclick="return confirm('确认删除吗？');" href="/_admin/api/del/<%=val.uri%>">删除</a>
+                        <a href="#">文档</a>
+                    </div>
+                </li>
+            <%});%>
+        <%}else{%>
+            没有数据，先添加吧！
+        <%}%>
+    </ul>
+</body>
+</html>
