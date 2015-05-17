@@ -16,7 +16,7 @@
     
 参数名 | 必选 | 类型及范围 | 说明
 --- | --- | --- | --- <%data.param_name.forEach(function(val,index){%>
-<%=data.param_name[index]%> | <%if(data.param_required[index]){%>true<%}else{%>false<%}%> | <%=data.param_type[index]%> | <%=data.param_desc[index]||'无'%><%});%>
+<%=data.param_name[index]%> | <%if(data.param_required[index] === '1'){%>true<%}else{%>false<%}%> | <%=data.param_type[index]%> | <%=data.param_desc[index]||'无'%><%});%>
 <% }else{ %>
 无
 <% }%>
