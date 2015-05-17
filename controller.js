@@ -78,13 +78,32 @@ controller.doc = function(req, res) {
         return res.send('json error');
     }
 
+
+    if(data.resdata){
+        try{
+            data.resdata = JSON.parse(data.resdata);
+            data.resdata.forEach(function(val){
+                val.data = template.compile(data.res)({
+                    global: controller.config.global,
+                    get: val.get || {},
+                    post: val.post || {},
+                });
+            });
+        } catch(e){
+            delete data.resdata;
+        }
+    }
+
+
+
     html = template.compile(fs.readFileSync(path.resolve(controller.config.__dirname, 'views', 'doc.tpl')).toString())({
         data: data
     });
 
 
     res.render('doc', {
-        html: marked(html)
+        html: marked(html),
+        title: data.desc,
     });
 }
 
@@ -93,11 +112,13 @@ controller.doc = function(req, res) {
  */
 controller.list = function(req, res) {
     var config = controller.config,
-        data;
+        result, data;
 
     if (fs.existsSync(config.cache_path)) {
         data = fs.readdirSync(config.cache_path);
         if (data && data.length > 0) {
+            result = {};
+
             data.forEach(function(that, index) {
                 data[index] = JSON.parse(fs.readFileSync(path.resolve(config.cache_path, that)).toString());
                 delete data[index]['res'];
@@ -106,12 +127,24 @@ controller.list = function(req, res) {
                 if (data[index].desc) {
                     data[index].desc = String(data[index].desc).substr(0, 20) + '...';
                 }
+
+                //如果没有组
+                if(!data[index].group){
+                    data[index].group = '默认';
+                }
+
+                if(!result[data[index].group]){
+                    result[data[index].group] = [];
+                }
+
+                result[data[index].group].push(data[index]);
             });
         }
     }
 
+    data = null;
     res.render('list', {
-        data: data,
+        data: result,
         admin_url: config.admin,
         doc_url: config.doc,
     });

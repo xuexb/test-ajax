@@ -21,9 +21,15 @@
 无
 <% }%>
 
-<%if(data.res){%>
+<%if(data.resdata){%>
 ## 返回值 ##
+
+<%for(var key in data.resdata){%>
+
+### <%=data.resdata[key].name%> ###
+
 ```
-<%==data.res%>
+<%==data.resdata[key].data%>
 ```
+<%}%>
 <%}%>

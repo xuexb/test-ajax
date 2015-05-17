@@ -18,6 +18,9 @@
                 说明: <input type="text" name="desc" value="<%=data.desc%>">
             </li>
             <li>
+                分组: <input type="text" name="group" value="<%=data.group%>">
+            </li>
+            <li>
                 请求类型: <select name="method">
                     <option value="GET"<%if(data.method==='GET'){%> selected<%}%>>GET</option>
                     <option value="POST"<%if(data.method==='POST'){%> selected<%}%>>POST</option>
@@ -71,6 +74,10 @@
             <li>
                 返回值：
                 <textarea name="res" style="width:500px;height:300px;"><%=data.res%></textarea>
+            </li>
+            <li>
+                返回值编译数据：
+                <textarea name="resdata" style="width:500px;height:300px;"><%=data.resdata%></textarea>
             </li>
             <li>
                 <button type="submit">
