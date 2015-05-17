@@ -20,7 +20,8 @@ test_ajax({
     static_path: ['/static/'], //静态域，基于url
     admin: '/admin/', //后台域，基于url
     doc: '/doc/', //文档域，基于url
-    open: true,
+    open: true,//是否打开浏览器
+    md: false,//是否支持md文档浏览
 });
 ```
 

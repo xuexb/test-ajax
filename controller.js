@@ -7,25 +7,57 @@ var marked = require('marked');
 var template = require('art-template/node/template-native.js');
 
 
-var admin = module.exports = {};
+var controller = module.exports = {};
 
 
-admin.config = null;
+controller.config = null;
+
+/**
+ * md文档浏览
+ */
+controller.md = function(req, res){
+    var uri = req.url,
+        data, title;
+
+    uri = path.resolve(controller.config.base, '.'+ uri);
+
+
+    //不存在 
+    if (!fs.existsSync(uri)) {
+        return res.send('404');
+    }
+
+
+    data = fs.readFileSync(uri).toString();
+
+    if(!data){
+        return res.send('empty');
+    }
+
+    data = marked(data);
+    
+    title = (data.match(/<h1[^>]+?>(.+?)<\/h1>/) || ['', '文档预览'])[1];
+
+    res.render('doc', {
+        html: data,
+        title: title
+    });
+}
 
 /**
  * 创建模板
  */
-admin.create = function(req, res) {
+controller.create = function(req, res) {
     res.render('create', {
-        admin_url: admin.config.admin,
-        doc_url: admin.config.doc,
+        admin_url: controller.config.admin,
+        doc_url: controller.config.doc,
     });
 }
 
 /**
  * 文档预览
  */
-admin.doc = function(req, res) {
+controller.doc = function(req, res) {
     var uri = req.param('uri'),
         data, html;
 
@@ -33,7 +65,7 @@ admin.doc = function(req, res) {
         return res.send('uri empty');
     }
 
-    uri = path.resolve(admin.config.cache_path, uri + '.json');
+    uri = path.resolve(controller.config.cache_path, uri + '.json');
 
     //不存在 
     if (!fs.existsSync(uri)) {
@@ -46,7 +78,7 @@ admin.doc = function(req, res) {
         return res.send('json error');
     }
 
-    html = template.compile(fs.readFileSync(path.resolve(admin.config.base, 'views', 'doc.tpl')).toString())({
+    html = template.compile(fs.readFileSync(path.resolve(controller.config.__dirname, 'views', 'doc.tpl')).toString())({
         data: data
     });
 
@@ -59,14 +91,15 @@ admin.doc = function(req, res) {
 /**
  * 列表
  */
-admin.list = function(req, res) {
-    var data;
+controller.list = function(req, res) {
+    var config = controller.config,
+        data;
 
-    if (fs.existsSync(admin.config.cache_path)) {
-        data = fs.readdirSync(admin.config.cache_path);
+    if (fs.existsSync(config.cache_path)) {
+        data = fs.readdirSync(config.cache_path);
         if (data && data.length > 0) {
             data.forEach(function(that, index) {
-                data[index] = JSON.parse(fs.readFileSync(path.resolve(admin.config.cache_path, that)).toString());
+                data[index] = JSON.parse(fs.readFileSync(path.resolve(config.cache_path, that)).toString());
                 delete data[index]['res'];
 
                 //截取
@@ -79,8 +112,8 @@ admin.list = function(req, res) {
 
     res.render('list', {
         data: data,
-        admin_url: admin.config.admin,
-        doc_url: admin.config.doc,
+        admin_url: config.admin,
+        doc_url: config.doc,
     });
 }
 
@@ -89,14 +122,14 @@ admin.list = function(req, res) {
  * 删除
  * @param {string} uri 链接uri
  */
-admin.del = function(req, res) {
+controller.del = function(req, res) {
     var uri = req.param('uri');
 
     if (!uri) {
         return res.send('uri empty');
     }
 
-    uri = path.resolve(admin.config.cache_path, uri + '.json');
+    uri = path.resolve(controller.config.cache_path, uri + '.json');
 
     //不存在 
     if (!fs.existsSync(uri)) {
@@ -113,7 +146,7 @@ admin.del = function(req, res) {
  * 编辑
  * @param {string} uri 链接uri
  */
-admin.edit = function(req, res) {
+controller.edit = function(req, res) {
     var uri = req.param('uri'),
         data;
 
@@ -121,7 +154,7 @@ admin.edit = function(req, res) {
         return res.send('uri empty');
     }
 
-    uri = path.resolve(admin.config.cache_path, uri + '.json');
+    uri = path.resolve(controller.config.cache_path, uri + '.json');
 
     if (!fs.existsSync(uri)) {
         return res.send('404');
@@ -135,8 +168,8 @@ admin.edit = function(req, res) {
 
     res.render('edit', {
         data: data,
-        admin_url: admin.config.admin,
-        doc_url: admin.config.doc,
+        admin_url: controller.config.admin,
+        doc_url: controller.config.doc,
     });
 }
 
@@ -144,7 +177,7 @@ admin.edit = function(req, res) {
 /**
  * 保存
  */
-admin.save = function(req, res) {
+controller.save = function(req, res) {
     var data = req.body;
     var url = data.url;
     var uri;
@@ -169,10 +202,10 @@ admin.save = function(req, res) {
     }
 
     // 拼路径
-    url = path.resolve(admin.config.cache_path, md5(url) + '.json');
+    url = path.resolve(controller.config.cache_path, md5(url) + '.json');
 
     // 创建缓存目录
-    mkdir(path.resolve(admin.config.cache_path));
+    mkdir(path.resolve(controller.config.cache_path));
 
     // 写文件
     fs.writeFileSync(url, JSON.stringify(data));

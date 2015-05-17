@@ -5,7 +5,7 @@ var open = require('open');
 var path = require('path');
 var md5 = require('MD5');
 var template = require('art-template/node/template-native.js');
-var admin = require('./admin');
+var controller = require('./controller');
 var fs = require('fs');
 var path = require('path');
 var bodyParser = require('body-parser');
@@ -18,13 +18,17 @@ module.exports = function(options) {
 
     //默认参数
     var config = {
+        base: './',
         prot: 90, //端口
         cache_path: "./__cache/", //缓存文件的路径，基于base
         global: {},
-        static_path: ['/static/'],//静态域，基于url
-        admin: '/admin/',//后台域，基于url
-        doc: '/doc/',//文档域，基于url
+        static_path: ['/static/'], //静态域，基于url
+        admin: '/admin/', //后台域，基于url
+        doc: '/doc/', //文档域，基于url
         open: true,
+        md: false,
+        beforeSend: function(req, res){
+        }
     }
 
     //合并配置
@@ -33,19 +37,17 @@ module.exports = function(options) {
         config[key] = options[key];
     });
 
-    //根
-    config.base = path.resolve(__dirname);
+    //项目根目录
+    config.base = path.resolve('./', config.base);
+
+    //程序根目录
+    config.__dirname = path.resolve(__dirname);
 
     //得到缓存的绝对路径
     config.cache_path = path.resolve('./', config.cache_path);
 
     //写入到后台
-    admin.config = config;
-
-    //配置静态域
-    config.static_path.forEach(function(val){
-        app.use(val, express.static(path.resolve(config.base, val)));
-    });
+    controller.config = config;
 
     //配置json
     app.use(bodyParser.urlencoded({
@@ -57,17 +59,28 @@ module.exports = function(options) {
     template.config('base', '');
     template.config('extname', '.html');
     app.engine('.html', template.__express);
-    app.set('views', path.resolve(__dirname, 'views'));
+    app.set('views', path.resolve(config.__dirname, 'views'));
     app.set('view engine', 'html');
 
 
     //配置路径
-    app.get(config.doc +':uri', admin.doc);
-    app.get(config.admin +'create', admin.create);
-    app.post(config.admin +'save', admin.save);
-    app.get(config.admin, admin.list);
-    app.get(config.admin +'del/:uri', admin.del);
-    app.get(config.admin +'edit/:uri', admin.edit);
+    app.get(config.doc + ':uri', controller.doc);
+    app.get(config.admin + 'create', controller.create);
+    app.post(config.admin + 'save', controller.save);
+    app.get(config.admin, controller.list);
+    app.get(config.admin + 'del/:uri', controller.del);
+    app.get(config.admin + 'edit/:uri', controller.edit);
+
+    // 支持md文档
+    if (config.md) {
+        app.get('*.md', controller.md);
+    }
+
+    //配置静态域
+    config.static_path.forEach(function(val) {
+        app.use(val, express.static(path.resolve(config.base, '.' + val)));
+    });
+
 
     //截获到其他的请求
     app.all('*', function(req, res, next) {
@@ -76,6 +89,10 @@ module.exports = function(options) {
             param_err_arr, param_data;
 
         url = url.pathname;
+
+        if(config.beforeSend(req, res) === false){
+            return false;
+        }
 
         //如果为根目录
         if (!url || url === '/') {
@@ -124,9 +141,8 @@ module.exports = function(options) {
 
             // 验证参数
             data.param_name.forEach(function(val, index) {
-
                 //如果为必须，而参数里又没有
-                if (data.param_required[index] && !param_data[val]) {
+                if (data.param_required[index] === '1' && !param_data[val]) {
                     param_err_arr.push({
                         name: val,
                         type: 'required'
@@ -164,7 +180,6 @@ module.exports = function(options) {
 
         //如果模板需要编译
         if (data['res-tpl']) {
-            console.log(data['res'])
             data['res'] = template.compile(data['res'])({
                 get: req.query,
                 post: req.body,
@@ -180,7 +195,6 @@ module.exports = function(options) {
             }
         })(function() {
             if (data.dataType === 'json') {
-                console.log(data['res'])
                 try {
                     data['res'] = JSON.parse(data['res']);
                 } catch (e) {
@@ -198,7 +212,7 @@ module.exports = function(options) {
 
     app.listen(config.prot);
 
-    if(config.open){
-        open('http://127.0.0.1:'+ config.prot + config.admin);
+    if (config.open) {
+        open('http://127.0.0.1:' + config.prot + config.admin);
     }
 }
