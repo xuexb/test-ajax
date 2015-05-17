@@ -18,7 +18,7 @@ module.exports = function(options) {
 
     //默认参数
     var config = {
-        base: './',
+        base: './',//项目根目录
         prot: 90, //端口
         cache_path: "./__cache/", //缓存文件的路径，基于base
         global: {},
