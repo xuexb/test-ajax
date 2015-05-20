@@ -58,7 +58,7 @@ test_ajax({
 <%=global['404']%>
 ```
 
-### static_patch
+### static_path
 `array`, 静态资源目录，比如模板，样式，以`url`开始
 
 ### admin
