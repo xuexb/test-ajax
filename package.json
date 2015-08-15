@@ -1,6 +1,6 @@
 {
   "name": "test-ajax",
-  "version": "1.2.7",
+  "version": "2.0.0",
   "description": "本地测试接口",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/xuexb/test-ajax.git"
   },
-  "author": "xieliang",
+  "author": "xiaowu",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/xuexb/test-ajax/issues"
@@ -22,7 +22,10 @@
     "art-template": "3.x",
     "MD5": "*",
     "body-parser":"*",
-    "marked": "*"
+    "marked": "*",
+    "serve-static": "*",
+    "serve-index": "*",
+    "highlight.js": "*"
   },
   "dependencies": {
     "express": "*",
@@ -30,6 +33,9 @@
     "art-template": "3.x",
     "MD5": "*",
     "body-parser":"*",
-    "marked": "*"
+    "marked": "*",
+    "serve-static": "*",
+    "serve-index": "*",
+    "highlight.js": "*"
   }
 }

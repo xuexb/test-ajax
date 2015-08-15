@@ -4,43 +4,128 @@ var md5 = require('MD5');
 var fs = require('fs');
 var path = require('path');
 var marked = require('marked');
+var pkg = require('./package.json');
 var template = require('art-template/node/template-native.js');
 
+var renderMarkdown = function(data){
+    var highlight = require('highlight.js');
+    var renderer = new marked.Renderer();
+
+    renderer.heading = function(text, level) {
+        var escapedText = encodeURIComponent(text); //.replace(/[^\w]+/g, '');
+
+        return '<h' + level + '><a name="anchor-' +
+            escapedText +
+            '" href="#anchor-' +
+            escapedText +
+            '"></a><a class="anchor" href="#anchor-'+escapedText+'"><span class="header-link">#</span>' +
+            text + '</a></h' + level + '>';
+    }
+    // 渲染代码
+    // renderer.code = function (data, lang) {
+        // return highlight.highlightAuto(data).value;
+    // };
+    
+    // md => html
+    data = marked(data, {
+        renderer: renderer
+    });
+
+    return data;
+}
 
 var controller = module.exports = {};
 
-
 controller.config = null;
+    
+/**
+ * 升级版本
+ */
+controller.updateVersion = function(req, res, next){
+    var config = controller.config;
+    var data;
+
+    if (fs.existsSync(config.cache_path)) {
+        data = fs.readdirSync(config.cache_path);
+        data = data.map(function(val){
+            return JSON.parse(fs.readFileSync(path.resolve(config.cache_path, val)).toString());
+        }).filter(function(val){
+            return !val.version || val.version < pkg.version;
+        });
+    }
+
+    if(!data || data.length === 0){
+        return res.end('没有可升级的文件');
+    }
+
+    mkdir(path.resolve(controller.config.cache_path));
+
+    data.forEach(function(val){
+        if(val.param_name){
+            if('string' === typeof val.param_name){
+                val.param_name = [val.param_name];
+                val.param_type = [val.param_type];
+                val.param_required = [val.param_required];
+                val.param_desc = [val.param_desc];
+            }
+
+            val.param = [];
+            val.param_name.forEach(function(val_name, index){
+                if(!val_name){
+                    return;
+                }
+                val.param.push({
+                    name: val_name,
+                    type: val.param_type[index],
+                    desc: val.param_desc[index],
+                    required: val.param_required[index]
+                });
+            });
+
+            if(!val.param.length){
+                delete val.param;
+            }
+
+            delete val.param_name;
+            delete val.param_type;
+            delete val.param_required;
+            delete val.param_desc;
+        }
+
+        val.version = pkg.version;
+
+        fs.writeFileSync(path.resolve(controller.config.cache_path, val.uri + '.json'), JSON.stringify(val));
+
+        console.log('升级 => uri:'+ val.uri +', url:'+ val.url);
+    });
+
+    res.end('ok');
+}
 
 /**
  * md文档浏览
  */
-controller.md = function(req, res){
-    var uri = req.url,
-        data, title;
+controller.md = function(req, res, next){
+    var uri = req.url;
+    var data;
 
     uri = path.resolve(controller.config.base, '.'+ uri);
 
-
     //不存在 
     if (!fs.existsSync(uri)) {
-        return res.send('404');
+        return next();
     }
 
 
     data = fs.readFileSync(uri).toString();
 
     if(!data){
-        return res.send('empty');
+        return next();
     }
 
-    data = marked(data);
-    
-    title = (data.match(/<h1[^>]+?>(.+?)<\/h1>/) || ['', '文档预览'])[1];
-
     res.render('doc', {
-        html: data,
-        title: title
+        html: renderMarkdown(data),
+        title: (data.match(/<h1[^>]+?>(.+?)<\/h1>/) || ['', '文档预览'])[1]
     });
 }
 
@@ -57,25 +142,29 @@ controller.create = function(req, res) {
 /**
  * 文档预览
  */
-controller.doc = function(req, res) {
-    var uri = req.param('uri'),
-        data, html;
+controller.doc = function(req, res, next) {
+    var uri = req.param('uri');
+    var data;
+    var html;
 
     if (!uri) {
-        return res.send('uri empty');
+        return next();
     }
 
     uri = path.resolve(controller.config.cache_path, uri + '.json');
 
     //不存在 
     if (!fs.existsSync(uri)) {
-        return res.send('404');
+        return next();
     }
 
     try {
         data = JSON.parse(fs.readFileSync(uri).toString());
     } catch (e) {
-        return res.send('json error');
+        return res.json({
+            errcode: 103,
+            errmsg: 'doc json error'
+        });
     }
 
 
@@ -87,6 +176,9 @@ controller.doc = function(req, res) {
                     global: controller.config.global,
                     get: val.get || {},
                     post: val.post || {},
+                    setDelay: function(){},
+                    setHeader: function(){},
+                    setStatus: function(){}
                 });
             });
         } catch(e){
@@ -95,15 +187,15 @@ controller.doc = function(req, res) {
     }
 
 
-
-    html = template.compile(fs.readFileSync(path.resolve(controller.config.__dirname, 'views', 'doc.tpl')).toString())({
+    html = fs.readFileSync(path.resolve(controller.config.__dirname, 'views', 'doc.tpl')).toString();
+    html = template.compile(html)({
         data: data
     });
 
 
     res.render('doc', {
-        html: marked(html),
-        title: data.desc,
+        html: renderMarkdown(html),
+        title: data.desc || '接口',
     });
 }
 
@@ -111,8 +203,9 @@ controller.doc = function(req, res) {
  * 列表
  */
 controller.list = function(req, res) {
-    var config = controller.config,
-        result, data;
+    var config = controller.config;
+    var result;
+    var data;
 
     if (fs.existsSync(config.cache_path)) {
         data = fs.readdirSync(config.cache_path);
@@ -143,6 +236,7 @@ controller.list = function(req, res) {
     }
 
     data = null;
+
     res.render('list', {
         data: result,
         admin_url: config.admin,
@@ -155,18 +249,18 @@ controller.list = function(req, res) {
  * 删除
  * @param {string} uri 链接uri
  */
-controller.del = function(req, res) {
+controller.del = function(req, res, next) {
     var uri = req.param('uri');
 
     if (!uri) {
-        return res.send('uri empty');
+        return next();
     }
 
     uri = path.resolve(controller.config.cache_path, uri + '.json');
 
     //不存在 
     if (!fs.existsSync(uri)) {
-        return res.send('404');
+        return next();
     }
 
     fs.unlinkSync(uri);
@@ -179,24 +273,27 @@ controller.del = function(req, res) {
  * 编辑
  * @param {string} uri 链接uri
  */
-controller.edit = function(req, res) {
-    var uri = req.param('uri'),
-        data;
+controller.edit = function(req, res, next) {
+    var uri = req.param('uri');
+    var data;
 
     if (!uri) {
-        return res.send('uri empty');
+        return next();
     }
 
     uri = path.resolve(controller.config.cache_path, uri + '.json');
 
     if (!fs.existsSync(uri)) {
-        return res.send('404');
+        return next();
     }
 
     try {
         data = JSON.parse(fs.readFileSync(uri).toString());
     } catch (e) {
-        res.send('json error');
+        res.json({
+            errcode: 104,
+            errmsg: 'edit json error'
+        });
     }
 
     res.render('edit', {
@@ -210,14 +307,14 @@ controller.edit = function(req, res) {
 /**
  * 保存
  */
-controller.save = function(req, res) {
+controller.save = function(req, res, next) {
     var data = req.body;
     var url = data.url;
     var uri;
 
     //根目录
     if (!url || url === '/') {
-        return res.send('url error');
+        return next();
     }
 
     // 生成uri
@@ -226,12 +323,39 @@ controller.save = function(req, res) {
     // 追加
     data.uri = uri;
 
-    //处理多个参数
-    if (data.param_name && 'string' === typeof data.param_name) {
-        data.param_name = [data.param_name];
-        data.param_type = [data.param_type];
-        data.param_required = [data.param_required];
-        data.param_desc = [data.param_desc];
+    data.version = pkg.version;
+
+    // 如果有参数
+    if(data.param_name){
+        // 如果是传的一个
+        if('string' === typeof data.param_name){
+            data.param_name = [data.param_name];
+            data.param_type = [data.param_type];
+            data.param_required = [data.param_required];
+            data.param_desc = [data.param_desc];
+        }
+
+        data.param = [];
+        data.param_name.forEach(function(val, index){
+            if(!val){
+                return;
+            }
+            data.param.push({
+                name: val,
+                type: data.param_type[index],
+                desc: data.param_desc[index],
+                required: data.param_required[index]
+            });
+        });
+
+        if(!data.param.length){
+            delete data.param;
+        }
+
+        delete data.param_name;
+        delete data.param_type;
+        delete data.param_required;
+        delete data.param_desc;
     }
 
     // 拼路径

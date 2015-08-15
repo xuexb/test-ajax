@@ -2,6 +2,9 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width,minimum-scale=1.0,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,minimal-ui" name="viewport" />
     <title><%=title||'文档'%></title>
     <!-- reset -->
     <style type="text/css">
@@ -96,7 +99,7 @@ sub { bottom: -0.25em; }
     color: #08c;
 }*/
 
-a{color:#2c3039;}
+a{color:#2c3039;text-decoration: underline; }
 
 /* 鼠标悬停 */
 a:hover {
@@ -117,68 +120,9 @@ samp {
     font-size: 1em;
 }
 
-/* 清理浮动 */
-.clear:after {
-    visibility:hidden;
-    display:block;
-    font-size:0;
-    content:" ";
-    clear:both;
-    height:0;
-}
-.clear {
-    zoom:1; /* for IE6 IE7 */
-}
-
-/* 隐藏, 通常用来与 JS 配合 */
-body .hide {
-    display:none;
-}
-
-/* 设置内联, 减少浮动带来的bug */
-.fl,
-.fr {
-    display:inline;
-}
-.fl {
-    float:left;
-}
-.fr {
-    float:right;
-}
-
-/* 单行文字溢出时出现省略号，需设定宽度 */ 
-.text-overflow {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-
-/* 人民币符号 */
-.rmb {
-    font-family: arial;
-    font-style: normal;
-}
-
-
-
-
-/*fix*/
-
 /*解决图片上/下有边界*/
 img{vertical-align: top;}
 
-
-/**
- * 解决按钮要比正常宽的bug
- */
-button,input{
-    overflow: visible;
-}
-textarea{
-    resize:none;/*让其不可以改变大小*/
-}
 </style>
 
     <style type="text/css">
@@ -330,9 +274,6 @@ textarea{
     background:transparent;
     border:0
 }
-.markdown-body pre {
-    word-wrap:normal
-}
 .markdown-body pre code, .markdown-body pre tt {
     display:inline;
     max-width:initial;
@@ -340,22 +281,59 @@ textarea{
     margin:0;
     overflow:initial;
     line-height:inherit;
-    word-wrap:normal;
     background-color:transparent;
     border:0
 }
+
+
 /*xl*/
-.markdown-body pre{border: 1px solid  #ccc;padding: 5px;border-radius:3px;background-color:rgba(0, 0, 0, 0.07);}
-body{
-    padding:30px;
+.markdown-body pre{background-color: #000; color: #fff; border-radius: 10px;padding: 10px; }
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3{
+    padding-bottom: 0; 
 }
+body{
+    padding:10px;
+}
+.markdown-body a.anchor{
+    padding-left: 5px; 
+    display: block; 
+    position: relative; 
+    color: #2c3039; 
+    -webkit-transition: padding-left .4s; 
+    -o-transition: padding-left .4s; 
+    transition: padding-left .4s; 
+}
+.markdown-body a.anchor:hover{
+    text-decoration: none; 
+    padding-left: 22px; 
+}
+.markdown-body a.anchor:hover .header-link{
+    visibility: visible;
+    opacity: 1; 
+}
+.markdown-body a .header-link{
+    color: #2c3039; 
+    position: absolute; 
+    left: 0; top: 0; 
+    visibility: hidden;
+    opacity: 0; 
+    -webkit-transition: opacity .3s; 
+    -o-transition: opacity .3s; 
+    transition: opacity .3s; 
+}
+
     </style>
+    <link rel="stylesheet" type="text/css" href="//github.xuexb.com/static/hljs/hljs.css">
 </head>
 <body>
     
     <div class="markdown-body">
         <%==html%>
     </div>
-
+    
+    <script type="text/javascript" src="//github.xuexb.com/static/hljs/hljs.js"></script>
+    <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
 </body>
 </html>

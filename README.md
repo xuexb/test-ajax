@@ -20,17 +20,13 @@ test_ajax({
     global: {
         test: '我是测试的'
     },
-    static_path: ['/static/'], //静态域，基于url
     admin: '/admin/', //后台域，基于url
     doc: '/doc/', //文档域，基于url
     open: true,//是否打开浏览器
-    md: true,//md文档
     beforeSend: function(req, res){//请求前回调，返回false则不请求接口，这里不算静态资源，后台，文档
     }
 });
 ```
-
-[在线demo](http://test-ajax.xuexb.com/admin/)
 
 ## options
 
@@ -58,9 +54,6 @@ test_ajax({
 <%=global['404']%>
 ```
 
-### static_path
-`array`, 静态资源目录，比如模板，样式，以`url`开始
-
 ### admin
 `string`, 后台路径，`url`开始
 
@@ -76,6 +69,59 @@ test_ajax({
 * 文档下载
 * 接口打包下载，上传
 * 当本地静态遇到`node-combo`时的处理（ps:下一个要研究的东西就是`node-combo`&&单元测试）
+
+## 编译模板参数
+
+编译返回值模板里提供以下方法：
+
+```js
+/**
+ * 获取get的参数
+ * @type {Object}
+ */
+get
+
+/**
+ * 获取post的参数
+ * @type {Object}
+ */
+post
+
+/**
+ * 获取配置参数中global对象
+ * @type {Object}
+ */
+global
+
+/**
+ * 设置header头信息
+ * @param {string} name 名称
+ * @param {string} val  值
+ */
+setHeader: function(name, val){
+}
+
+/**
+ * 设置响应状态码
+ * @param {number} code 状态码
+ */
+setStatus: function(code){
+}
+
+/**
+ * 设置延迟时间
+ * @param {number} time 延迟时间，ms
+ */
+setDelay: function(time){
+}
+
+/**
+ * 设置jsonp参数名
+ * @param {string} name 参数名
+ */
+setCallback: function(name){
+}
+```
 
 ## 后话
 这套机制适合我吧，因为我们项目静态域单独，但接口是以根目录开始的，比如我使用的目录大概是：
