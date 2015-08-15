@@ -58,7 +58,7 @@ module.exports = function(options) {
     // 配置模板
     template.config('base', '');
     template.config('extname', '.html');
-    template.config('compress', true);
+    // template.config('compress', true);
     app.engine('.html', template.__express);
     app.set('views', path.resolve(config.__dirname, 'views'));
     app.set('view engine', 'html');
