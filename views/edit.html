@@ -32,20 +32,20 @@
                 <dl>
                     <dt style="padding-bottom:20px;">参数 <a href="#" class="J-param-add">添加</a></dt>
 
-                    <%if(data.param_name){%>
-                        <%data.param_name.forEach(function(val, index){%>
+                    <%if(data.param){%>
+                        <%data.param.forEach(function(val, index){%>
                             <dd>
-                                <input type="text" placeholder="参数名" name="param_name" value="<%=data.param_name[index]%>">
-                                <input type="text" placeholder="参数说明" name="param_desc" value="<%=data.param_desc[index]%>">
+                                <input type="text" placeholder="参数名" name="param_name" value="<%=val.name%>">
+                                <input type="text" placeholder="参数说明" name="param_desc" value="<%=val.desc%>">
                                 <select name="param_type">
-                                    <option value="*"<%if(data.param_type[index]==='*'){%> selected<%}%>>全部类型</option>
-                                    <option value="int"<%if(data.param_type[index]==='int'){%> selected<%}%>>int</option>
-                                    <option value="boolean"<%if(data.param_type[index]==='boolean'){%> selected<%}%>>boolean</option>
-                                    <option value="string"<%if(data.param_type[index]==='string'){%> selected<%}%>>string</option>
+                                    <option value="*"<%if(val.type==='*'){%> selected<%}%>>全部类型</option>
+                                    <option value="int"<%if(val.type==='int'){%> selected<%}%>>int</option>
+                                    <option value="boolean"<%if(val.type==='boolean'){%> selected<%}%>>boolean</option>
+                                    <option value="string"<%if(val.type==='string'){%> selected<%}%>>string</option>
                                 </select>
                                 <select name="param_required">
-                                    <option value="0"<%if(data.param_required[index]==='0'){%> selected<%}%>>否</option>
-                                    <option value="1"<%if(data.param_required[index]==='1'){%> selected<%}%>>是</option>
+                                    <option value="0"<%if(val.required==='0'){%> selected<%}%>>否</option>
+                                    <option value="1"<%if(val.required==='1'){%> selected<%}%>>是</option>
                                 </select>
 
                                 <a href="#" class="J-param-del">删除</a>
