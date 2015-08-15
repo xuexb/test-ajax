@@ -21,7 +21,7 @@
     "open": "*",
     "art-template": "3.x",
     "MD5": "*",
-    "body-parser":"*",
+    "body-parser": "*",
     "marked": "*",
     "serve-static": "*",
     "serve-index": "*",
@@ -32,10 +32,13 @@
     "open": "*",
     "art-template": "3.x",
     "MD5": "*",
-    "body-parser":"*",
+    "body-parser": "*",
     "marked": "*",
     "serve-static": "*",
     "serve-index": "*",
     "highlight.js": "*"
-  }
+  },
+  "keywords": [
+    "testajax"
+  ]
 }
