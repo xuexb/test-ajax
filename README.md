@@ -121,6 +121,31 @@ setDelay: function(time){
  */
 setCallback: function(name){
 }
+
+Date
+
+parseInt
+
+parseFloat
+
+Math
+
+/**
+ * 格式化时间
+ * @param  {string} str  格式化的样式
+ * @param  {number|Date|undefined} date 时间缀，时间对象，空
+ * @return {string}      结果
+ */
+function dateFormat(str, date) {
+}
+
+/**
+ * 美化时间缀
+ * @param  {number} time 时间缀，13位
+ * @return {string}      结果
+ */
+function dateElapsed(time) {
+}
 ```
 
 ## 后话

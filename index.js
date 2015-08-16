@@ -4,7 +4,7 @@ var express = require('express')
 var open = require('open');
 var path = require('path');
 var md5 = require('MD5');
-var template = require('art-template/node/template-native.js');
+var template = require('./template');
 var controller = require('./controller');
 var fs = require('fs');
 var path = require('path');
@@ -56,9 +56,6 @@ module.exports = function(options) {
     app.use(bodyParser.json());
 
     // 配置模板
-    template.config('base', '');
-    template.config('extname', '.html');
-    // template.config('compress', true);
     app.engine('.html', template.__express);
     app.set('views', path.resolve(config.__dirname, 'views'));
     app.set('view engine', 'html');
