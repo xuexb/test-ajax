@@ -1,6 +1,6 @@
 {
   "name": "test-ajax",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "description": "本地测试接口",
   "main": "index.js",
   "scripts": {
@@ -17,26 +17,6 @@
   },
   "homepage": "https://github.com/xuexb/test-ajax",
   "devDependencies": {
-    "express": "*",
-    "open": "*",
-    "art-template": "3.x",
-    "MD5": "*",
-    "body-parser": "*",
-    "marked": "*",
-    "serve-static": "*",
-    "serve-index": "*",
-    "highlight.js": "*"
-  },
-  "dependencies": {
-    "express": "*",
-    "open": "*",
-    "art-template": "3.x",
-    "MD5": "*",
-    "body-parser": "*",
-    "marked": "*",
-    "serve-static": "*",
-    "serve-index": "*",
-    "highlight.js": "*"
   },
   "keywords": [
     "testajax"
