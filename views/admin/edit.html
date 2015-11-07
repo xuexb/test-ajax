@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>修改api</title>
+
+</head>
+<body>
+    
+    <h1>修改api</h1>
+
+    <form action="/admin/save" method="post">
+        <ul id="J-create">
+            <li>
+                链接: <input type="text" name="url" value="<%=data.url%>">
+            </li>
+            <li>
+                说明: <input type="text" name="desc" value="<%=data.desc%>">
+            </li>
+            <li>
+                分组: <input type="text" name="group" value="<%=data.group%>">
+            </li>
+            <li>
+                请求类型: <select name="method">
+                    <option value="GET"<%if(data.method==='GET'){%> selected<%}%>>GET</option>
+                    <option value="POST"<%if(data.method==='POST'){%> selected<%}%>>POST</option>
+                    <option value="PUT"<%if(data.method==='PUT'){%> selected<%}%>>PUT</option>
+                    <option value="DELETE"<%if(data.method==='DELETE'){%> selected<%}%>>DELETE</option>
+                </select>
+            </li>
+            <li>
+                <dl>
+                    <dt style="padding-bottom:20px;">参数 <a href="#" class="J-param-add">添加</a></dt>
+
+                    <%if(data.param){%>
+                        <%data.param.forEach(function(val, index){%>
+                            <dd>
+                                <input type="text" placeholder="参数名" name="param_name" value="<%=val.name%>">
+                                <input type="text" placeholder="参数说明" name="param_desc" value="<%=val.desc%>">
+                                <select name="param_type">
+                                    <option value="*"<%if(val.type==='*'){%> selected<%}%>>全部类型</option>
+                                    <option value="int"<%if(val.type==='int'){%> selected<%}%>>int</option>
+                                    <option value="boolean"<%if(val.type==='boolean'){%> selected<%}%>>boolean</option>
+                                    <option value="string"<%if(val.type==='string'){%> selected<%}%>>string</option>
+                                </select>
+                                <select name="param_required">
+                                    <option value="0"<%if(val.required==='0'){%> selected<%}%>>否</option>
+                                    <option value="1"<%if(val.required==='1'){%> selected<%}%>>是</option>
+                                </select>
+
+                                <a href="#" class="J-param-del">删除</a>
+                            </dd>
+                        <%});%>
+                    <%}%>
+                </dl>
+            </li>
+            <li>
+                延迟: <input type="text" name="delay" value="<%=data.delay%>">
+            </li>
+            <li>
+                返回值类型:
+                <select name="dataType">
+                    <option value="text"<%if(data.dataType==='text'){%> selected<%}%>>text</option>
+                    <option value="json"<%if(data.dataType==='json'){%> selected<%}%>>json</option>
+                    <option value="jsonp"<%if(data.dataType==='jsonp'){%> selected<%}%>>jsonp</option>
+                    <option value="js"<%if(data.dataType==='js'){%> selected<%}%>>js</option>
+                </select>
+            </li>
+            <li>
+                返回值：
+                <textarea name="res" style="width:500px;height:300px;"><%=data.res%></textarea>
+            </li>
+            <li>
+                返回值编译数据：
+                <textarea name="resdata" style="width:500px;height:300px;"><%=data.resdata%></textarea>
+            </li>
+            <li>
+                <button type="submit">
+                    <span>保存</span>
+                </button>
+            </li>
+        </ul>
+    </form>
+
+
+    <script type="text/javascript" src="http://libs.useso.com/js/jquery/1.11.1-rc2/jquery.min.js"></script>
+    <script type="text/template" id="J-param-tpl">
+        <dd>
+            <input type="text" placeholder="参数名" name="param_name">
+            <input type="text" placeholder="参数说明" name="param_desc">
+            <select name="param_type">
+                <option value="*">全部类型</option>
+                <option value="int">int</option>
+                <option value="boolean">boolean</option>
+                <option value="string">string</option>
+            </select>
+            <select name="param_required">
+                <option value="0">否</option>
+                <option value="1">是</option>
+            </select>  
+
+            <a href="#" class="J-param-del">删除</a>
+        </dd>
+    </script>
+    <script type="text/javascript">
+        (function(){
+            $('#J-create').on('click', '.J-param-add', function(){
+                $(this).closest('dl').append($('#J-param-tpl').html());
+                return false;
+            });
+
+            $('#J-create').on('click', '.J-param-del', function(){
+                $(this).closest('dd').remove();
+                return false;
+            });
+
+        })();
+    </script>
+
+</body>
+</html>

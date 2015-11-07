@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>后台主页</title>
+    
+    <link rel="stylesheet" type="text/css" href="http://static.jiapai.cc/src/css/lib/reset.css">
+    <style type="text/css">
+        #list li{
+            height:30px;line-height:30px;
+            overflow:hidden;
+            padding:0 10px;
+        }
+        a{
+            text-decoration:underline;
+        }
+        #list li:hover{
+            background-color:#f0f0f0;
+        }
+        h1{
+            font-size:30px;
+        }
+        #list  dd{
+            padding-top:10px;
+            padding-left:10px;
+        }
+        dl{
+            padding-left:10px;
+        }
+        dt{
+            font-size:16px;
+            border-left:3px solid  #f85c1e;
+            padding-left:10px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>API列表</h1>
+    <p>
+        <a href="/admin/create">添加</a>
+    </p>
+    
+    <dl id="list">
+        <%if(list){%>
+            <%for(var key in list){%>
+                <dt><%=key%></dt>
+                <dd>
+                    <ul>
+                        <%list[key].forEach(function(val, index){%>
+                            <li>
+                                <div class="fl">
+                                    <a href="<%=val.url%>" target="_blank"><%=val.url%></a> <%if(val.desc){%>[<%=val.desc%>]<%}%>
+                                </div>
+                                <div class="fr">
+                                    <a href="/admin/edit/<%=val.uri%>">编辑</a>
+                                    <a onclick="return confirm('确认删除吗？');" href="/admin/del/<%=val.uri%>">删除</a>
+                                    <a href="/doc/<%=val.uri%>" target="_blank">文档</a>
+                                </div>
+                            </li>
+                        <%});%>
+                    </ul>
+                </dd>
+            <%}%>
+        <%}else{%>
+            <dd>
+                没有数据，先添加吧
+            </dd>
+        <%}%>
+    </dl>
+</body>
+</html>
