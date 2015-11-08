@@ -27,11 +27,12 @@
     "extend": "^3.0.0",
     "marked": "^0.3.5",
     "mkdir-p": "0.0.7",
-    "serve-static": "^1.10.0"
+    "serve-static": "^1.10.0",
+    "mockjs": "^0.1.10"
   },
   "devDependencies": {
-    "fecs": "^0.4.12",
-    "babel": "5.8.20"
+    "babel": "5.8.20",
+    "fecs": "^0.4.12"
   },
   "keywords": [
     "testajax"

@@ -36,6 +36,14 @@ var _url = require('url');
 
 var _url2 = _interopRequireDefault(_url);
 
+var _mockjs = require('mockjs');
+
+var _mockjs2 = _interopRequireDefault(_mockjs);
+
+var _marked = require('marked');
+
+var _marked2 = _interopRequireDefault(_marked);
+
 var _template = require('./template');
 
 var _template2 = _interopRequireDefault(_template);
@@ -44,15 +52,65 @@ var _packageJson = require('../package.json');
 
 var _packageJson2 = _interopRequireDefault(_packageJson);
 
+var _tips = require('./tips');
+
+var _tips2 = _interopRequireDefault(_tips);
+
+var _util = require('./util');
+
+var _util2 = _interopRequireDefault(_util);
+
 var app = undefined;
 var router = _express2['default'].Router();
+
+var renderDocTree = function renderDocTree(data, uri, group) {
+    var filter = function filter(val) {
+
+        if (val.children && val.children.length) {
+            return val.text === group;
+        }
+
+        return val.uri.indexOf(uri) > -1;
+    };
+
+    var fn = function fn(res) {
+        var html = '';
+
+        res.forEach(function (val) {
+            if (!val.children || !val.children.length) {
+                if (filter(val)) {
+                    html += '<li class="nav-tree-file nav-tree-current">';
+                } else {
+                    html += '<li class="nav-tree-file">';
+                }
+
+                html += '\n                    <div class="nav-tree-text">\n                        <a href="' + val.uri + '" class="nav-tree-file-a" data-uri="' + val.uri + '" title="' + val.text + '">\n                            ' + val.text + '\n                        </a>\n                    </div>\n                </li>';
+            } else {
+                if (filter(val)) {
+                    html += '<li class="nav-tree-dir nav-tree-dir-open">';
+                } else {
+                    html += '<li class="nav-tree-dir">';
+                }
+                html += '\n                    <div class="nav-tree-text">\n                        <a href="#" class="nav-tree-dir-a" data-uri="' + val.uri + '" title="' + val.text + '">' + val.text + '</a>\n                    </div>';
+
+                html += fn(val.children);
+
+                html += '</li>';
+            }
+        });
+
+        return '<ul>' + html + '</ul>';
+    };
+
+    return fn(data);
+};
 
 /**
  * 解析uri，传的uri里必须缓存过
  */
 router.param('uri', function (req, res, next, id) {
     var config = app.config();
-    var filepath = _path2['default'].resolve(config.cachePath, id + '.json');
+    var filepath = app.getUriToPath(id);
 
     if (!_fs2['default'].existsSync(filepath)) {
         return next();
@@ -79,7 +137,7 @@ router.get('/admin/del/:uri', function (req, res, next) {
         return next();
     }
 
-    var filepath = _path2['default'].resolve(app.config('cachePath'), uri + '.json');
+    var filepath = app.getUriToPath(uri);
 
     // 不存在
     if (!_fs2['default'].existsSync(filepath)) {
@@ -103,7 +161,7 @@ router.get('/admin/edit/:uri', function (req, res, next) {
 
     var data = undefined;
     var config = app.config();
-    var filepath = _path2['default'].resolve(config.cachePath, uri + '.json');
+    var filepath = app.getUriToPath(uri);
 
     // 如果没有文件
     if (!_fs2['default'].existsSync(filepath)) {
@@ -113,10 +171,7 @@ router.get('/admin/edit/:uri', function (req, res, next) {
     try {
         data = JSON.parse(_fs2['default'].readFileSync(filepath).toString());
     } catch (e) {
-        res.json({
-            errcode: 104,
-            errmsg: 'edit json error'
-        });
+        res.json(_tips2['default'].PARSE_JSON_ERROR);
     }
 
     res.render('admin/edit', {
@@ -175,10 +230,10 @@ router.post('/admin/save', function (req, res, next) {
     delete data.param_desc;
 
     // 拼路径
-    var filepath = _path2['default'].resolve(config.cachePath, uri + '.json');
+    var filepath = app.getUriToPath(uri);
 
     // 创建缓存目录
-    _mkdirP2['default'].sync(_path2['default'].resolve(config.cachePath));
+    _mkdirP2['default'].sync(config.cachePath);
 
     // 写文件
     _fs2['default'].writeFileSync(filepath, JSON.stringify(data));
@@ -197,46 +252,96 @@ router.get('/admin/create', function (req, res, next) {
  * 后台主页
  */
 router.get('/admin/', function (req, res, next) {
-    var config = app.config();
-    var result = undefined;
+    res.render('admin/index', {
+        list: app.getCacheFileList()
+    });
+});
 
-    var render = function render() {
-        return res.render('admin/index', {
-            list: result
-        });
-    };
+router.get('/doc/', function (req, res, next) {
+    // 渲染
+    res.render('doc', {
+        html: (0, _marked2['default'])('欢迎访问接口文档～'),
+        title: '接口文档',
+        config: app.config(),
+        treeData: renderDocTree(app.getDocTree())
+    });
+});
 
-    if (!_fs2['default'].existsSync(config.cachePath)) {
-        console.log('cachePath目录不存在', config.cachePath);
-        return render();
+/**
+ * 文档
+ */
+router.get('/doc/:uri', function (req, res, next) {
+    var uri = req.uri;
+
+    if (!uri) {
+        return next();
     }
 
-    // 读取缓存目录里文件
-    var data = _fs2['default'].readdirSync(config.cachePath);
+    var filepath = app.getUriToPath(uri);
 
-    if (!data || !data.length) {
-        console.log('cachePath目录下没有缓存文件');
-        return render();
+    // 不存在
+    if (!_fs2['default'].existsSync(filepath)) {
+        return next();
     }
 
-    result = {};
+    var filedata = _fs2['default'].readFileSync(filepath).toString();
 
-    data.forEach(function (val, index) {
-        data[index] = JSON.parse(_fs2['default'].readFileSync(_path2['default'].resolve(config.cachePath, val)).toString());
+    try {
+        filedata = JSON.parse(filedata);
+    } catch (e) {
+        return res.json(_tips2['default'].PARSE_JSON_ERROR);
+    }
 
-        // 如果没有组
-        if (!data[index].group) {
-            data[index].group = '默认';
+    // 根据resdata里的配置解析出res
+    // 必须非js才有
+    if (filedata.resdata && filedata.dataType !== 'js') {
+        try {
+            // 非标准解析。解析出来的如：
+            // [{name: '', }, {}]
+            filedata.resdata = _util2['default'].parseJSON(filedata.resdata);
+            filedata.resdata.forEach(function (val) {
+
+                // 往对外上附加个data，让模板里使用
+                val.data = _template2['default'].compile(filedata.res)({
+                    global: app.config('global'),
+                    get: val.get || {},
+                    post: val.post || {},
+                    setDelay: function setDelay() {},
+                    setHeader: function setHeader() {},
+                    setStatus: function setStatus() {}
+                });
+
+                // 如果是json,jsonp则解析mock
+                if (filedata.dataType === 'json' || filedata.dataType === 'jsonp') {
+                    val.data = _util2['default'].parseJSON(val.data);
+                    val.data = _mockjs2['default'].mock(val.data);
+                    val.data = JSON.stringify(val.data, null, 4);
+                }
+            });
+        } catch (e) {
+            delete filedata.resdata;
         }
+    } else {
+        delete filedata.resdata;
+    }
 
-        if (!result[data[index].group]) {
-            result[data[index].group] = [];
-        }
-
-        result[data[index].group].push(data[index]);
+    // 使用markdown模板解析数据
+    var docMarkdown = _fs2['default'].readFileSync(_path2['default'].resolve(app.config('__dirname'), './views/admin/doc.markdown')).toString();
+    docMarkdown = _template2['default'].compile(docMarkdown)({
+        data: filedata
     });
 
-    render();
+    if (req.query.pjax) {
+        return res.send((0, _marked2['default'])(docMarkdown));
+    }
+
+    // 渲染
+    res.render('doc', {
+        html: (0, _marked2['default'])(docMarkdown),
+        title: filedata.desc || '接口',
+        config: app.config(),
+        treeData: renderDocTree(app.getDocTree(), uri, filedata.group || app.config('defaultGroup'))
+    });
 });
 
 /**
@@ -250,7 +355,7 @@ router.all('*', function (req, res, next) {
     var uri = (0, _MD52['default'])(url);
 
     // 生成缓存文件路径
-    var filepath = _path2['default'].resolve(config.cachePath, uri + '.json');
+    var filepath = app.getUriToPath(uri);
 
     // 缓存文件不存在
     if (!_fs2['default'].existsSync(filepath)) {
@@ -268,53 +373,49 @@ router.all('*', function (req, res, next) {
     try {
         data = JSON.parse(_fs2['default'].readFileSync(filepath).toString());
     } catch (e) {
-        return res.json({
-            errcode: 101,
-            errmsg: 'api json error'
-        });
+        return res.json(_tips2['default'].PARSE_JSON_ERROR);
     }
 
     // 类型不对
     if (req.method.toLowerCase() !== data.method.toLowerCase()) {
-        return res.json({
-            errcode: 102,
-            errmsg: 'method error'
-        });
+        return res.json(_tips2['default'].METHOD_ERROR);
     }
 
     // 如果需要验证参数
     if (data.param) {
         var _ret = (function () {
-            var param_err_arr = [];
-            var param_data = undefined;
+            var paramErrorArr = [];
+            var paramData = undefined;
 
             if (data.method.toLowerCase() === 'get') {
-                param_data = req.query;
+                paramData = req.query;
             } else {
-                param_data = req.body;
+                paramData = req.body;
             }
 
             // 验证参数
             data.param.forEach(function (val) {
                 // 如果为必须，而参数里又没有
-                if (val.required === '1' && !param_data[val]) {
-                    param_err_arr.push({
-                        name: val,
+                if (val.required === '1' && !paramData[val.name]) {
+                    paramErrorArr.push({
+                        name: val.name,
                         type: 'required'
                     });
                     return;
                 }
 
                 // 如果参数里有这个值 并且不是全部类型
-                if (param_data[val] && val.type !== '*') {
-                    if (val.type === 'boolean' && param_data[val] !== 'true' && param_data[val] !== 'false') {
-                        param_err_arr.push({
-                            name: val,
-                            type: 'type not boolean'
-                        });
-                        return;
-                    } else if (val.type === 'int' && !/^\d+$/.test(param_data[val])) {
-                        param_err_arr.push({
+                if (paramData[val.name] && val.type !== '*') {
+                    if (val.type === 'boolean') {
+                        if (paramData[val.name] !== 'true' && paramData[val.name] !== 'false') {
+                            paramErrorArr.push({
+                                name: val,
+                                type: 'type not boolean'
+                            });
+                            return;
+                        }
+                    } else if (val.type === 'int' && !/^\d+$/.test(paramData[val.name])) {
+                        paramErrorArr.push({
                             name: val,
                             type: 'type not int'
                         });
@@ -323,11 +424,11 @@ router.all('*', function (req, res, next) {
                 }
             });
 
-            if (param_err_arr.length) {
+            if (paramErrorArr.length) {
                 return {
                     v: res.json({
-                        errcode: 1006,
-                        errmsg: param_err_arr
+                        errcode: _tips2['default'].PARAM_ERROR.errcode,
+                        errmsg: paramErrorArr
                     })
                 };
             }
@@ -336,33 +437,33 @@ router.all('*', function (req, res, next) {
         if (typeof _ret === 'object') return _ret.v;
     }
 
-    data.res = _template2['default'].compile(data.res)({
-        get: req.query,
-        post: req.body,
-        global: config.global,
-        setHeader: function setHeader(name, val) {
-            res.append(name, val);
-        },
-        setStatus: function setStatus(code) {
-            res.status(code);
-        },
-        setDelay: function setDelay(time) {
-            data.delay = time;
-        },
-        setCallback: function setCallback(name) {
-            app.express.set('jsonp callback name', name);
-        }
-    });
+    if (data.dataType !== 'js') {
+        data.res = _template2['default'].compile(data.res)({
+            get: req.query,
+            post: req.body,
+            global: config.global,
+            setHeader: function setHeader(name, val) {
+                res.append(name, val);
+            },
+            setStatus: function setStatus(code) {
+                res.status(code);
+            },
+            setDelay: function setDelay(time) {
+                data.delay = time;
+            },
+            setCallback: function setCallback(name) {
+                app.express.set('jsonp callback name', name);
+            }
+        });
+    }
 
     var callback = function callback() {
         if (data.dataType === 'json' || data.dataType === 'jsonp') {
             try {
-                data.res = JSON.parse(data.res);
+                data.res = _util2['default'].parseJSON(data.res);
+                data.res = _mockjs2['default'].mock(data.res);
             } catch (e) {
-                data.res = {
-                    errcode: 107,
-                    errmsg: 'res json error'
-                };
+                data.res = _tips2['default'].PARSE_JSON_ERROR;
             }
 
             res[data.dataType](data.res);
@@ -370,10 +471,7 @@ router.all('*', function (req, res, next) {
             try {
                 new Function('req', 'res', 'next', data.res)(req, res, next);
             } catch (e) {
-                console.error(e);
-                res.json({
-                    error: 1
-                });
+                res.json(_tips2['default'].PARSE_JS_ERROR);
             }
         } else {
             if (data.res) {

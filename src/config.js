@@ -11,5 +11,7 @@ export default {
     port: 8091,
     cachePath: './__cache/',
     global: {},
-    domain: '*'
+    domain: '*',
+    name: 'apijs',
+    defaultGroup: '默认'
 };
