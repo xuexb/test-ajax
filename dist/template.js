@@ -18,6 +18,7 @@ var _artTemplateNodeTemplateNative2 = _interopRequireDefault(_artTemplateNodeTem
 
 _artTemplateNodeTemplateNative2['default'].config('base', '');
 _artTemplateNodeTemplateNative2['default'].config('extname', '.html');
+_artTemplateNodeTemplateNative2['default'].config('escape', false);
 
 exports['default'] = _artTemplateNodeTemplateNative2['default'];
 module.exports = exports['default'];

@@ -89,6 +89,7 @@ var TestAjax = (function () {
         key: '_init',
         value: function _init() {
             var self = this;
+            var config = self.config();
             var app = self.express = (0, _express2['default'])();
 
             _router2['default'].setApp(self);
@@ -102,7 +103,7 @@ var TestAjax = (function () {
 
             // 配置模板
             app.engine('.html', _template2['default'].__express);
-            app.set('views', _path2['default'].resolve(self.config('__dirname'), './views/'));
+            app.set('views', _path2['default'].resolve(config.__dirname, './views/'));
             app.set('view engine', 'html');
 
             // 添加响应头
@@ -115,7 +116,11 @@ var TestAjax = (function () {
             app.use('/update/', _update2['default']);
 
             // 配置静态static代理到包目录里的static
-            app.use('/static', (0, _serveStatic2['default'])(_path2['default'].resolve(self.config('__dirname'), './static/')));
+            app.use('/static', (0, _serveStatic2['default'])(_path2['default'].resolve(config.__dirname, './static/')));
+
+            Object.keys(config.global).forEach(function (key) {
+                config.global[key] = JSON.stringify(config.global[key]);
+            });
         }
 
         /**

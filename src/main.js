@@ -29,6 +29,9 @@ export default class TestAjax {
         this._resolvePath();
 
         this._init();
+
+
+
     }
 
     /**
@@ -38,6 +41,7 @@ export default class TestAjax {
      */
     _init() {
         let self = this;
+        let config = self.config();
         let app = self.express = express();
 
         router.setApp(self);
@@ -51,7 +55,7 @@ export default class TestAjax {
 
         // 配置模板
         app.engine('.html', template.__express);
-        app.set('views', path.resolve(self.config('__dirname'), './views/'));
+        app.set('views', path.resolve(config.__dirname, './views/'));
         app.set('view engine', 'html');
 
         // 添加响应头
@@ -64,7 +68,11 @@ export default class TestAjax {
         app.use('/update/', update);
 
         // 配置静态static代理到包目录里的static
-        app.use('/static', serveStatic(path.resolve(self.config('__dirname'), './static/')));
+        app.use('/static', serveStatic(path.resolve(config.__dirname, './static/')));
+
+        Object.keys(config.global).forEach((key) => {
+            config.global[key] = JSON.stringify(config.global[key]);
+        });
     }
 
     /**
