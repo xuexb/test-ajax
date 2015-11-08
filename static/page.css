@@ -1,0 +1,160 @@
+
+
+.progress-indicator-2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background-color: #0A74DA;
+    z-index: 20; 
+}
+
+#nav {
+    position: fixed;
+    z-index: 10;
+    overflow: auto;
+    overflow: -moz-scrollbars-vertical;
+
+    width: 280px;
+    height: 100%;
+    padding: 15px;
+    border-right: 1px solid #bbb;
+
+    background-color: #fff;
+    -webkit-box-shadow: 0 0 40px #ccc;
+       -moz-box-shadow: 0 0 40px #ccc;
+            box-shadow: 0 0 40px #ccc;
+
+    -webkit-transition: left .4s; 
+    -o-transition: left .4s; 
+    transition: left .4s; 
+}
+
+#nav-tree ul {
+    list-style: none;
+}
+
+#nav-tree ul,
+#nav-tree li {
+    margin: 0;
+    line-height: 26px;
+}
+
+#nav-tree ul ul {
+    margin-left: 20px;
+}
+.nav-tree-text > a{
+    overflow: hidden;
+    height: 26px; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#nav-tree a {
+    padding-left: 5px; 
+    display: block;
+}
+#nav-tree a:hover,
+.nav-tree-current > .nav-tree-text > a{
+    background-color: #f0f0f0; 
+    text-decoration: none; 
+}
+.nav-tree-dir-open{
+    height: auto !important; 
+}
+.nav-tree-dir > ul{
+    display: none; 
+}
+.nav-tree-dir-open > ul{
+    display: block; 
+}
+
+.nav-tree-file > .nav-tree-text > a:before,
+.nav-tree-dir > .nav-tree-text > a:before {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-stroke-width: 0.2px;
+
+    margin-right: 3px; 
+}
+.nav-tree-file > .nav-tree-text > a:before{
+    content: "\e653";
+}
+.nav-tree-dir > .nav-tree-text > a:before{
+    content: "\e61a"; 
+}
+
+.nav-tree-dir-open > .nav-tree-text > a:before{
+    content: "\e652";
+}
+
+#nav-mini{
+    display: none; 
+}
+#content {
+    margin: 0 20px;
+    padding-top: 10px;
+    padding-left: 300px;
+    padding-bottom: 10px; 
+}
+#content.loading:after{
+    content: '加载中';
+    font-size: 0; 
+    display: block; 
+    position: fixed; 
+    left: 0; top: 0; 
+    z-index: 1000; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(255,255,255,.5) url('/static/loading-32-32.gif') no-repeat center center;
+}
+#nav.nav-show{
+    left: 0; 
+}
+
+@media (max-width: 800px) {
+    #nav{
+        left: -280px; 
+        opacity: .96; 
+    }
+    #nav-mini{
+        z-index: 11; 
+        display: block; 
+        width: 50px; 
+        height: 50px; 
+        position: fixed; 
+        left: 0; top: 0; 
+        background-color: #ccc; 
+        text-align: center; 
+        line-height: 50px; 
+    }
+    #content{
+        padding-left: 0; 
+    }
+}
+
+
+/*扩展md*/
+.markdown-body h2 .anchor,
+.markdown-body h3 .anchor{
+    opacity: 0; 
+    text-decoration: none; 
+    color: #333; 
+    vertical-align: middle; 
+    margin-left: -20px; 
+    padding-right: 6px; 
+    outline: none;
+}
+.markdown-body h2:hover .anchor,
+.markdown-body h3:hover .anchor{
+    opacity: 1; 
+}
+.markdown-body h2 .anchor:before,
+.markdown-body h3 .anchor:before{
+    content: "\e630";
+    vertical-align: middle; 
+}

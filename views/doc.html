@@ -1,339 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <title><%=title||'文档'%> - <%=config.name%></title>
     <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta content="width=device-width,minimum-scale=1.0,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,minimal-ui" name="viewport" />
-    <title><%=title||'文档'%></title>
-    <!-- reset -->
-    <style type="text/css">
-
-/* 防止用户自定义背景颜色对网页的影响，添加让用户可以自定义字体 */
-html {
-    color:#2c3039;
-    background-color:#f6f9f9;
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-}
-
-/* 内外边距通常让各个浏览器样式的表现位置不同 */
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td,
-    hr,button,article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section {
-    margin:0;padding:0;
-}
-
-
-/* 要注意表单元素并不继承父级 font 的问题 */
-body,button,input,select,textarea {
-    font:12px/1.5 'Microsoft YaHei',tahoma,arial,"Hiragino Sans GB",\5b8b\4f53;
-}
-input,select,textarea {
-    font-size:100%;
-}
-
-/* 去掉各Table  cell 的边距并让其边重合 */
-table {
-    border-collapse:collapse;border-spacing:0;
-}
-
-/* IE bug fixed: th 不继承 text-align*/
-th {
-    text-align:inherit;
-}
-
-/* 去除默认边框 */
-fieldset,img {
-    border:0;
-}
-
-/* ie6 7 8(q) bug 显示为行内表现 */
-iframe {
-    display:block;
-}
-
-/* 去掉 firefox 下此元素的边框 */
-abbr,acronym {
-    border:0;font-variant:normal;
-}
-
-/* 一致的 del 样式 */
-del {
-    text-decoration:line-through;
-}
-
-address,caption,cite,code,dfn,em,th,var,i {
-    font-style:normal;
-    font-weight:normal;
-}
-
-/* 去掉列表前的标识, li 会继承 */
-ol,ul {
-    list-style:none;
-}
-
-/* 对齐是排版最重要的因素, 别让什么都居中 */
-caption,th {
-    text-align:left;
-}
-
-/* 来自yahoo, 让标题都自定义, 适应多个系统应用 */
-h1,h2,h3,h4,h5,h6 {
-    font-size:100%;
-    font-weight:normal;
-}
-
-q:before,q:after {
-    content:'';
-}
-
-/* 统一上标和下标 */
-sub, sup {
-    font-size: 75%; line-height: 0; position: relative; vertical-align: baseline;
-}
-sup { top: -0.5em; }
-sub { bottom: -0.25em; }
-
-/* 正常链接 未访问 */
-/*a:link {
-    color: #08c;
-}*/
-
-a{color:#2c3039;text-decoration: underline; }
-
-/* 鼠标悬停 */
-a:hover {
-    text-decoration: underline;
-}
-
-/* 默认不显示下划线，保持页面简洁 */
-ins,a {
-    text-decoration:none;
-}
-
-/* 代码字体 */
-code,
-kbd,
-pre,
-samp {
-    font-family: monospace, serif;
-    font-size: 1em;
-}
-
-/*解决图片上/下有边界*/
-img{vertical-align: top;}
-
-</style>
-
-    <style type="text/css">
-        
-/*markdown*/
-.markdown-body {
-    overflow:hidden;
-    font-family:"Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
-    font-size:16px;
-    line-height:1.6;
-    word-wrap:break-word
-}
-.markdown-body a{color: #4183c4;}
-.markdown-body>*:first-child {
-    margin-top:0 !important
-}
-.markdown-body>*:last-child {
-    margin-bottom:0 !important
-}
-.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
-    position:relative;
-    margin-top:1em;
-    margin-bottom:16px;
-    font-weight:bold;
-    line-height:1.4
-}
-.markdown-body h1 {
-    padding-bottom:0.3em;
-    font-size:2.25em;
-    line-height:1.2;
-    border-bottom:1px solid #eee
-}
-.markdown-body h2 {
-    padding-bottom:0.3em;
-    font-size:1.75em;
-    line-height:1.225;
-    border-bottom:1px solid #eee
-}
-.markdown-body h3 {
-    font-size:1.5em;
-    line-height:1.43
-}
-.markdown-body h4 {
-    font-size:1.25em
-}
-.markdown-body h5 {
-    font-size:1em
-}
-.markdown-body h6 {
-    font-size:1em;
-    color:#777
-}
-.markdown-body p, .markdown-body blockquote, .markdown-body ul, .markdown-body ol, .markdown-body dl, .markdown-body table, .markdown-body pre {
-    margin-top:0;
-    margin-bottom:16px
-}
-.markdown-body hr {
-    height:4px;
-    padding:0;
-    margin:16px 0;
-    background-color:#e7e7e7;
-    border:0 none
-}
-.markdown-body ul, .markdown-body ol {
-    padding-left:2em
-}
-.markdown-body ul ul, .markdown-body ul ol, .markdown-body ol ol, .markdown-body ol ul {
-    margin-top:0;
-    margin-bottom:0
-}
-.markdown-body ul{list-style-type: disc;}
-.markdown-body ol{list-style-type: decimal;}
-.markdown-body li>p {
-    margin-top:16px
-}
-.markdown-body dl {
-    padding:0
-}
-.markdown-body dl dt {
-    padding:0;
-    margin-top:16px;
-    font-size:1em;
-    font-style:italic;
-    font-weight:bold
-}
-.markdown-body dl dd {
-    padding:0 16px;
-    margin-bottom:16px
-}
-.markdown-body blockquote {
-    padding:0 15px;
-    color:#777;
-    border-left:4px solid #ddd
-}
-.markdown-body blockquote>:first-child {
-    margin-top:0
-}
-.markdown-body blockquote>:last-child {
-    margin-bottom:0
-}
-.markdown-body table {
-    display:block;
-    width:100%;
-    overflow:auto;
-    word-break:normal;
-    word-break:keep-all
-}
-.markdown-body table th {
-    font-weight:bold
-}
-.markdown-body table th, .markdown-body table td {
-    padding:6px 13px;
-    border:1px solid #ddd
-}
-.markdown-body table tr {
-    background-color:#fff;
-    border-top:1px solid #ccc
-}
-.markdown-body table tr:nth-child(2n) {
-    background-color:#f8f8f8
-}
-.markdown-body img {
-    max-width:100%;
-    -moz-box-sizing:border-box;
-    box-sizing:border-box
-}
-.markdown-body code, .markdown-body tt {
-    padding:0 2px;
-    padding-top:0.2em;
-    padding-bottom:0.2em;
-    margin:0;
-    font-size:85%;
-    background-color:rgba(0, 0, 0, 0.1);
-    border-radius:3px
-}
-.markdown-body code br, .markdown-body tt br {
-    display:none
-}
-.markdown-body del code {
-    text-decoration:inherit;
-    vertical-align:text-top
-}
-.markdown-body pre>code {
-    padding:0;
-    margin:0;
-    font-size:100%;
-    word-break:normal;
-    white-space:pre;
-    background:transparent;
-    border:0
-}
-.markdown-body pre code, .markdown-body pre tt {
-    display:inline;
-    max-width:initial;
-    padding:0;
-    margin:0;
-    overflow:initial;
-    line-height:inherit;
-    background-color:transparent;
-    border:0
-}
-
-
-/*xl*/
-.markdown-body pre{background-color: #000; color: #fff; border-radius: 10px;padding: 10px; }
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3{
-    padding-bottom: 0; 
-}
-body{
-    padding:10px;
-}
-.markdown-body a.anchor{
-    padding-left: 5px; 
-    display: block; 
-    position: relative; 
-    color: #2c3039; 
-    -webkit-transition: padding-left .4s; 
-    -o-transition: padding-left .4s; 
-    transition: padding-left .4s; 
-}
-.markdown-body a.anchor:hover{
-    text-decoration: none; 
-    padding-left: 22px; 
-}
-.markdown-body a.anchor:hover .header-link{
-    visibility: visible;
-    opacity: 1; 
-}
-.markdown-body a .header-link{
-    color: #2c3039; 
-    position: absolute; 
-    left: 0; top: 0; 
-    visibility: hidden;
-    opacity: 0; 
-    -webkit-transition: opacity .3s; 
-    -o-transition: opacity .3s; 
-    transition: opacity .3s; 
-}
-
-    </style>
-    <link rel="stylesheet" type="text/css" href="//github.xuexb.com/static/hljs/hljs.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta content="width=device-width,minimum-scale=1.0,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,minimal-ui" name="viewport">
+    <link rel="stylesheet" href="/static/reset.css">
+    <link rel="stylesheet" href="/static/github.css">
+    <link rel="stylesheet" href="/static/iconfont/iconfont.css">
+    <link rel="stylesheet" href="/static/page.css">
+    <link rel="stylesheet" href="/static/prism.css">
 </head>
 <body>
-    
-    <div class="markdown-body">
-        <%==html%>
+    <div class="progress-indicator-2"></div>
+    <div id="nav-mini">目录</div>
+    <div id="nav">
+        <h2><%=config.name%></h2>
+        <div id="nav-tree">
+            <%==treeData%>
+        </div>
     </div>
-    
-    <script type="text/javascript" src="//github.xuexb.com/static/hljs/hljs.js"></script>
-    <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+    <div id="content">
+        <div class="markdown-body">
+            <%==html%>
+        </div>
+    </div>
+
+
+    <script src="/static/jquery.js"></script>
+    <script src="/static/prism.js"></script>
+    <script src="/static/pjax.js"></script>
+    <script>
+        $(function(){
+            var $nav = $('#nav');
+            $nav.on('click', 'a.nav-tree-dir-a', function(){
+                $(this).parent().parent().toggleClass('nav-tree-dir-open');
+                return false;
+            });
+
+            $nav.on('click current', 'a.nav-tree-file-a', function(){
+                $nav.find('.nav-tree-current').removeClass('nav-tree-current');
+                $(this).parent().parent().addClass('nav-tree-current');
+            });
+            $nav.on('open', 'a', function(){
+                var $elem = $(this);
+
+                $elem.trigger('current');
+
+                $elem = $elem.parents('.nav-tree-dir');
+
+                while($elem.length){
+                    $elem.addClass('nav-tree-dir-open');
+                    $elem = $elem.parents('.nav-tree-dir');
+                }
+            });
+
+            $.pjax({
+                selector: 'a[href^="/doc/"]',
+                container: '#content .markdown-body', //内容替换的容器
+                show: '',//展现的动画，支持默认和fade, 可以自定义动画方式，这里为自定义的function即可。
+                cache: false,  //是否使用缓存
+                storage: false,  //是否使用本地存储
+                titleSuffix: ' - <%=config.name%>', //标题后缀
+                filter: function(){},
+                callback: function(){
+                    // 完成代码高亮
+                    $('#content pre > code').map(function() {
+                        Prism.highlightElement(this);
+                    });
+
+                    var url = location.href.replace(location.origin, '');
+
+                    $('a[data-uri="'+ url +'"]').trigger('open');
+
+                    $(window).trigger('resize');
+                }
+            });
+
+            $('#content .markdown-body').on('pjax.start', function(event){
+                $('#content').addClass('loading');
+            });
+
+            $('#content .markdown-body').on('pjax.end', function(event){
+                $('#content').removeClass('loading');
+            });
+
+            (function(fn){
+                if(window.requestAnimationFrame){
+                    fn();
+                }
+            })(function() {
+                var $w = $(window);
+                var $prog2 = $('.progress-indicator-2');
+                var wh = $w.height();
+                var h = $('body').height();
+                var sHeight = h - wh;
+
+                $w.on('resize', function(){
+                    wh = $w.height();
+                    h = $('body').height();
+                    sHeight = h - wh;
+                });
+
+                $w.on('scroll', function() {
+                  window.requestAnimationFrame(function(){
+                    var perc = Math.max(0, Math.min(1, $w.scrollTop() / sHeight));
+                    updateProgress(perc);
+                  });
+                });
+
+                function updateProgress(perc) {
+                    $prog2.css({width: perc * 100 + '%'});
+                }
+            });
+
+            $('#nav-mini').on('click', function(){
+                $('#nav').toggleClass('nav-show');
+            });
+        });
+    </script>
 </body>
 </html>

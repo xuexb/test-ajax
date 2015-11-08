@@ -12,11 +12,11 @@
 
 ## 请求参数 ##
 
-<%if(data.param_name && data.param_name.length){%>
+<%if(data.param && data.param.length){%>
     
 参数名 | 必选 | 类型及范围 | 说明
---- | --- | --- | --- <%data.param_name.forEach(function(val,index){%>
-<%=data.param_name[index]%> | <%if(data.param_required[index] === '1'){%>true<%}else{%>false<%}%> | <%=data.param_type[index]%> | <%=data.param_desc[index]||'无'%><%});%>
+--- | --- | --- | --- <%data.param.forEach(function(val,index){%>
+<%=val.name%> | <%if(val.required === '1'){%>true<%}else{%>false<%}%> | <%=val.type%> | <%=val.desc||'无'%><%});%>
 <% }else{ %>
 无
 <% }%>
@@ -28,7 +28,7 @@
 
 ### <%=data.resdata[key].name%> ###
 
-```
+```<%if(data.dataType === 'jsonp'){%>json<%}else{%><%=data.dataType%><%}%>
 <%==data.resdata[key].data%>
 ```
 <%}%>

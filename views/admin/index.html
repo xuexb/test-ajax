@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>列表</title>
+    <title>后台主页</title>
     
     <link rel="stylesheet" type="text/css" href="http://static.jiapai.cc/src/css/lib/reset.css">
     <style type="text/css">
@@ -38,24 +38,24 @@
     
     <h1>API列表</h1>
     <p>
-        <a href="<%=admin_url%>create">添加</a>
+        <a href="/admin/create">添加</a>
     </p>
     
     <dl id="list">
-        <%if(data){%>
-            <%for(var key in data){%>
+        <%if(list){%>
+            <%for(var key in list){%>
                 <dt><%=key%></dt>
                 <dd>
                     <ul>
-                        <%data[key].forEach(function(val, index){%>
+                        <%list[key].forEach(function(val, index){%>
                             <li>
                                 <div class="fl">
                                     <a href="<%=val.url%>" target="_blank"><%=val.url%></a> <%if(val.desc){%>[<%=val.desc%>]<%}%>
                                 </div>
                                 <div class="fr">
-                                    <a href="<%=admin_url%>edit/<%=val.uri%>">编辑</a>
-                                    <a onclick="return confirm('确认删除吗？');" href="<%=admin_url%>del/<%=val.uri%>">删除</a>
-                                    <a href="<%=doc_url%><%=val.uri%>" target="_blank">文档</a>
+                                    <a href="/admin/edit/<%=val.uri%>">编辑</a>
+                                    <a onclick="return confirm('确认删除吗？');" href="/admin/del/<%=val.uri%>">删除</a>
+                                    <a href="/doc/<%=val.uri%>" target="_blank">文档</a>
                                 </div>
                             </li>
                         <%});%>

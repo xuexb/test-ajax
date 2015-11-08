@@ -9,7 +9,7 @@
     
     <h1>创建api</h1>
 
-    <form action="<%=admin_url%>save" method="post">
+    <form action="/admin/save" method="post">
         <ul id="J-create">
             <li>
                 链接: <input type="text" name="url">
@@ -57,13 +57,8 @@
                 <select name="dataType">
                     <option value="text">text</option>
                     <option value="json">json</option>
-                </select>
-            </li>
-            <li>
-                返回值是否编译:
-                <select name="res-tpl">
-                    <option value="0">否</option>
-                    <option value="1">是</option>
+                    <option value="json">jsonp</option>
+                    <option value="js">js</option>
                 </select>
             </li>
             <li>

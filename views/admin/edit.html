@@ -9,7 +9,7 @@
     
     <h1>修改api</h1>
 
-    <form action="<%=admin_url%>save" method="post">
+    <form action="/admin/save" method="post">
         <ul id="J-create">
             <li>
                 链接: <input type="text" name="url" value="<%=data.url%>">
@@ -63,13 +63,7 @@
                     <option value="text"<%if(data.dataType==='text'){%> selected<%}%>>text</option>
                     <option value="json"<%if(data.dataType==='json'){%> selected<%}%>>json</option>
                     <option value="jsonp"<%if(data.dataType==='jsonp'){%> selected<%}%>>jsonp</option>
-                </select>
-            </li>
-            <li>
-                返回值是否编译:
-                <select name="res-tpl">
-                    <option value="0"<%if(data['res-tpl']==='0'){%> selected<%}%>>否</option>
-                    <option value="1"<%if(data['res-tpl']==='1'){%> selected<%}%>>是</option>
+                    <option value="js"<%if(data.dataType==='js'){%> selected<%}%>>js</option>
                 </select>
             </li>
             <li>
