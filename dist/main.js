@@ -117,6 +117,9 @@ var TestAjax = (function () {
 
             // 配置静态static代理到包目录里的static
             app.use('/static', (0, _serveStatic2['default'])(_path2['default'].resolve(config.__dirname, './static/')));
+            app.use('/', (0, _serveStatic2['default'])(config.base, {
+                index: ['index.html', 'index.htm', 'default.html', 'default.htm']
+            }));
 
             Object.keys(config.global).forEach(function (key) {
                 config.global[key] = JSON.stringify(config.global[key]);

@@ -129,9 +129,7 @@ router.param('uri', function (req, res, next, id) {
 /**
  * 主页
  */
-router.get('/', function (req, res, next) {
-    return res.render('index');
-});
+// router.get('/', (req, res, next) => res.render('index'));
 
 /**
  * 删除接口

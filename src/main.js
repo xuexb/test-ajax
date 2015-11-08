@@ -29,9 +29,6 @@ export default class TestAjax {
         this._resolvePath();
 
         this._init();
-
-
-
     }
 
     /**
@@ -69,6 +66,9 @@ export default class TestAjax {
 
         // 配置静态static代理到包目录里的static
         app.use('/static', serveStatic(path.resolve(config.__dirname, './static/')));
+        app.use('/', serveStatic(config.base, {
+            index: ['index.html', 'index.htm', 'default.html', 'default.htm']
+        }));
 
         Object.keys(config.global).forEach((key) => {
             config.global[key] = JSON.stringify(config.global[key]);

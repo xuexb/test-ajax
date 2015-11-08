@@ -92,7 +92,7 @@ router.param('uri', (req, res, next, id) => {
 /**
  * 主页
  */
-router.get('/', (req, res, next) => res.render('index'));
+// router.get('/', (req, res, next) => res.render('index'));
 
 /**
  * 删除接口
