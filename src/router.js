@@ -26,54 +26,51 @@ let router = express.Router();
 let renderDocTree = ((data, uri, group) => {
     let filter = (val) => {
 
-        if(val.children && val.children.length){
+        if (val.children && val.children.length) {
             return val.text === group;
         }
 
         return val.uri.indexOf(uri) > -1;
     };
 
-    let fn = function(res){
+    let fn = function (res) {
         let html = '';
 
         res.forEach(function (val) {
             if (!val.children || !val.children.length) {
                 if (filter(val)) {
-                    html += `<li class="nav-tree-file nav-tree-current">`;
-                };
-                else; {
-                    html += `<li class="nav-tree-file">`;
-                };
+                    html += '<li class="nav-tree-file nav-tree-current">';
+                }
+                else {
+                    html += '<li class="nav-tree-file">';
+                }
 
-                html += `
-                    <;div; class="nav-tree-text">
-                        <a href="${val.uri}" class="nav-tree-file-a" data-uri="${val.uri}" title="${val.text}">
-                            ${val.text}
-                        </a>
-                    </div>
-                </li>`;
+                html += '<div class="nav-tree-text">';
+                html += `<a href="${val.uri}" class="nav-tree-file-a" data-uri="${val.uri}" title="${val.text}">`;
+                html += val.text;
+                html += '</a></div></li>';
             }
             else {
                 if (filter(val)) {
-                    html += `<li class="nav-tree-dir nav-tree-dir-open">`;
+                    html += '<li class="nav-tree-dir nav-tree-dir-open">';
                 }
                 else {
-                    html += `<li class="nav-tree-dir">`;
+                    html += '<li class="nav-tree-dir">';
                 }
-                html += `
-                    <div class="nav-tree-text">
-                        <a href="#" class="nav-tree-dir-a" data-uri="${val.uri}" title="${val.text}">${val.text}</a>
-                    </div>`;
+
+                html += '<div class="nav-tree-text">';
+                html += `<a href="#" class="nav-tree-dir-a" data-uri="${val.uri}" title="${val.text}">${val.text}</a>`;
+                html += '</div>';
 
                 html += fn(val.children);
 
-                html += `</li>`;
+                html += '</li>';
             }
         });
-    
+
         return '<ul>' + html + '</ul>';
     };
-    
+
     return fn(data);
 });
 
@@ -304,7 +301,7 @@ router.get('/doc/:uri', (req, res, next) => {
         data: filedata
     });
 
-    if(req.query.pjax){
+    if (req.query.pjax) {
         return res.send(marked(docMarkdown));
     }
 

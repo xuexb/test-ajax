@@ -84,14 +84,20 @@ var renderDocTree = function renderDocTree(data, uri, group) {
                     html += '<li class="nav-tree-file">';
                 }
 
-                html += '\n                    <div class="nav-tree-text">\n                        <a href="' + val.uri + '" class="nav-tree-file-a" data-uri="' + val.uri + '" title="' + val.text + '">\n                            ' + val.text + '\n                        </a>\n                    </div>\n                </li>';
+                html += '<div class="nav-tree-text">';
+                html += '<a href="' + val.uri + '" class="nav-tree-file-a" data-uri="' + val.uri + '" title="' + val.text + '">';
+                html += val.text;
+                html += '</a></div></li>';
             } else {
                 if (filter(val)) {
                     html += '<li class="nav-tree-dir nav-tree-dir-open">';
                 } else {
                     html += '<li class="nav-tree-dir">';
                 }
-                html += '\n                    <div class="nav-tree-text">\n                        <a href="#" class="nav-tree-dir-a" data-uri="' + val.uri + '" title="' + val.text + '">' + val.text + '</a>\n                    </div>';
+
+                html += '<div class="nav-tree-text">';
+                html += '<a href="#" class="nav-tree-dir-a" data-uri="' + val.uri + '" title="' + val.text + '">' + val.text + '</a>';
+                html += '</div>';
 
                 html += fn(val.children);
 
