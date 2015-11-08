@@ -36,22 +36,22 @@ var util = {};
 util.parseJSON = function () {
     var str = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
 
-    return new Function('return ' + str)();
+    /* eslint-disable fecs-no-eval*/
+
+    /* eslint-disable no-eval*/
+    return eval('(' + str + ')');
+    // return new Function('return ' + str)();
 };
 
 /**
  * 读取json文件，跟require不同的是，这个不会缓存
  *
- * @param  {...string} args 路径
+ * @param {string} args 路径
  *
  * @return {Object}         解析后的json对象，错误时会有__error属性
  */
 util.readJSON = function () {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-    }
-
-    var filepath = _path2['default'].resolve.apply(_path2['default'], [_path2['default']].concat(args));
+    var filepath = _path2['default'].resolve.apply(_path2['default'], arguments);
 
     if (!_fs2['default'].existsSync(filepath)) {
         return _tips2['default'].PATH_NOT_EXIST;

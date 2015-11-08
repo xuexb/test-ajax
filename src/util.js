@@ -22,28 +22,34 @@ let util = {};
  * @return {Object}       json对象
  */
 util.parseJSON = (str = '') => {
-    return new Function('return ' + str)();
+
+    /* eslint-disable fecs-no-eval*/
+
+    /* eslint-disable no-eval*/
+    return eval('(' + str + ')');
+    // return new Function('return ' + str)();
 };
 
 /**
  * 读取json文件，跟require不同的是，这个不会缓存
  *
- * @param  {...string} args 路径
+ * @param {string} args 路径
  *
  * @return {Object}         解析后的json对象，错误时会有__error属性
  */
-util.readJSON = (...args) => {
-    let filepath = path.resolve(path, ...args);
+util.readJSON = function () {
+    let filepath = path.resolve.apply(path, arguments);
 
     if (!fs.existsSync(filepath)) {
         return Tips.PATH_NOT_EXIST;
     }
 
     let result;
-    try{
+    try {
         result = fs.readFileSync(filepath).toString();
         result = JSON.parse(result);
-    } catch(e){
+    }
+    catch (e) {
         result = Tips.PARSE_JSON_ERROR;
     }
 

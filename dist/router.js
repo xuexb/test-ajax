@@ -320,7 +320,7 @@ router.get('/doc/:uri', function (req, res, next) {
                 // 如果是json,jsonp则解析mock
                 if (filedata.dataType === 'json' || filedata.dataType === 'jsonp') {
                     val.data = _util2['default'].parseJSON(val.data);
-                    val.data = _mockjs2['default'].mock(val.data);
+                    val.data = _mockjs2['default'].mock(val.data) || {};
                     val.data = JSON.stringify(val.data, null, 4);
                 }
             });
@@ -467,7 +467,7 @@ router.all('*', function (req, res, next) {
         if (data.dataType === 'json' || data.dataType === 'jsonp') {
             try {
                 data.res = _util2['default'].parseJSON(data.res);
-                data.res = _mockjs2['default'].mock(data.res);
+                data.res = _mockjs2['default'].mock(data.res) || {};
             } catch (e) {
                 data.res = _tips2['default'].PARSE_JSON_ERROR;
             }

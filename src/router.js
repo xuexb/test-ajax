@@ -281,7 +281,7 @@ router.get('/doc/:uri', (req, res, next) => {
                 // 如果是json,jsonp则解析mock
                 if (filedata.dataType === 'json' || filedata.dataType === 'jsonp') {
                     val.data = Util.parseJSON(val.data);
-                    val.data = Mock.mock(val.data);
+                    val.data = Mock.mock(val.data) || {};
                     val.data = JSON.stringify(val.data, null, 4);
                 }
 
@@ -430,7 +430,7 @@ router.all('*', (req, res, next) => {
         if (data.dataType === 'json' || data.dataType === 'jsonp') {
             try {
                 data.res = Util.parseJSON(data.res);
-                data.res = Mock.mock(data.res);
+                data.res = Mock.mock(data.res) || {};
             }
             catch (e) {
                 data.res = tips.PARSE_JSON_ERROR;

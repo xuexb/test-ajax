@@ -1,5 +1,9 @@
-var TestAjax = require('./dist/main');
+var str = "{\n\
+status: 'ok\n'\
+}"
 
-var app = new TestAjax();
-
-app.run();
+var a = new Function('return '+ str)
+    console.log(str);
+    console.log(a);
+    console.log(a());
+    console.log(str.split(/\n/));
