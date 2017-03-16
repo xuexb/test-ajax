@@ -1,3 +1,1 @@
-# test-ajax
-
-最新的在这里 [apijs](https://github.com/xuexb/apijs)
+迁移到 [https://github.com/apijs](https://github.com/apijs)
